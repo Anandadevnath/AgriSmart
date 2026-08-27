@@ -215,9 +215,9 @@ export default function ScanCrop() {
         </motion.div>
 
         {/* WORKSPACE — two hairline-bordered ledger surfaces */}
-        <motion.div variants={rise} className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+        <motion.div variants={rise} className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* LEFT — capture surface */}
-          <div className="bg-white rounded-[16px] border border-[#e4eae3] p-6">
+          <div className="bg-white rounded-[16px] border border-[#e4eae3] p-6 flex flex-col">
             <div className="flex items-center gap-2 pb-5 mb-5 border-b border-[#e4eae3]">
               <Camera className="w-4 h-4 text-[#7cc24a]" />
               <span className="text-[12px] font-bold tracking-[0.08em] uppercase text-[#6f7d73]">
@@ -253,7 +253,7 @@ export default function ScanCrop() {
           </div>
 
           {/* RIGHT — preview & result surface */}
-          <div className="bg-white rounded-[16px] border border-[#e4eae3] p-6">
+          <div className="bg-white rounded-[16px] border border-[#e4eae3] p-6 flex flex-col">
             <div className="flex items-center gap-2 pb-5 mb-5 border-b border-[#e4eae3]">
               <Scan className="w-4 h-4 text-[#7cc24a]" />
               <span className="text-[12px] font-bold tracking-[0.08em] uppercase text-[#6f7d73]">
@@ -334,7 +334,7 @@ export default function ScanCrop() {
             )}
 
             {/* footer — clear + tip */}
-            <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
+            <div className="mt-auto flex flex-wrap items-center justify-between gap-3">
               <Button
                 variant="outline"
                 size="sm"

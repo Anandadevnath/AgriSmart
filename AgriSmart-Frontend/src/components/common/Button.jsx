@@ -17,10 +17,10 @@ export const Button = ({
   const baseClasses = "rounded-[14px] font-bold transition-all duration-300 flex items-center justify-center font-display tracking-tight";
 
   const variants = {
-    primary: "bg-[--color-brand-button-primary] text-[--color-brand-secondary] hover:bg-[#0d4a34] shadow-[0_2px_10px_rgba(11,59,42,0.18)] hover:shadow-[0_4px_16px_rgba(11,59,42,0.26)] disabled:opacity-50 disabled:hover:bg-[--color-brand-button-primary]",
-    secondary: "bg-transparent text-[--color-brand-button-outline] border border-[--color-brand-button-outline]/25 hover:border-[--color-brand-button-outline] hover:bg-[--color-brand-button-outline]/5 disabled:opacity-50",
-    outline: "border border-[--color-brand-button-outline] text-[--color-brand-button-outline] hover:bg-[--color-brand-button-outline] hover:text-white disabled:opacity-50",
-    accent: "bg-[--color-brand-highlight] text-[#0b3b2a] hover:bg-[#8ed25e] shadow-[0_2px_10px_rgba(124,194,74,0.35)] hover:shadow-[0_4px_18px_rgba(124,194,74,0.4)] disabled:opacity-50",
+    primary: "bg-[var(--color-brand-button-primary)] text-[var(--color-brand-secondary)] hover:bg-[#0d4a34] shadow-[0_2px_10px_rgba(11,59,42,0.18)] hover:shadow-[0_4px_16px_rgba(11,59,42,0.26)] disabled:opacity-50 disabled:hover:bg-[var(--color-brand-button-primary)]",
+    secondary: "bg-transparent text-[var(--color-brand-button-outline)] border border-[var(--color-brand-button-outline)]/25 hover:border-[var(--color-brand-button-outline)] hover:bg-[var(--color-brand-button-outline)]/5 disabled:opacity-50",
+    outline: "border border-[var(--color-brand-button-outline)] text-[var(--color-brand-button-outline)] hover:bg-[var(--color-brand-button-outline)] hover:text-white disabled:opacity-50",
+    accent: "bg-[var(--color-brand-highlight)] text-[#0b3b2a] hover:bg-[#8ed25e] shadow-[0_2px_10px_rgba(124,194,74,0.35)] hover:shadow-[0_4px_18px_rgba(124,194,74,0.4)] disabled:opacity-50",
   };
 
   const sizes = {
