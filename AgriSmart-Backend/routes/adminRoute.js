@@ -2,6 +2,7 @@ import express from "express";
 import { registerAdmin, loginAdmin } from "../controllers/adminController.js";
 import { getAllFarmers, getFarmerById, deleteFarmer, suspendFarmer, unsuspendFarmer } from "../controllers/adminFarmerController.js";
 import { getAllCropBatches, getCropBatchesByFarmer, getCropBatchById, updateCropBatch, deleteCropBatch } from "../controllers/adminCropController.js";
+import { isAuthenticated } from "../middleware/isAuthenticated.js";
 
 const router = express.Router();
 
@@ -9,19 +10,19 @@ const router = express.Router();
 router.post("/register", registerAdmin);
 router.post("/login", loginAdmin);
 
-// ==================== Farmer Management ====================
-router.get("/farmers", getAllFarmers);
-router.get("/farmers/:id", getFarmerById);
-router.delete("/farmers/:id", deleteFarmer);
-router.patch("/farmers/:id/suspend", suspendFarmer);
-router.patch("/farmers/:id/unsuspend", unsuspendFarmer);
+// ==================== Farmer Management (auth required) ====================
+router.get("/farmers", isAuthenticated, getAllFarmers);
+router.get("/farmers/:id", isAuthenticated, getFarmerById);
+router.delete("/farmers/:id", isAuthenticated, deleteFarmer);
+router.patch("/farmers/:id/suspend", isAuthenticated, suspendFarmer);
+router.patch("/farmers/:id/unsuspend", isAuthenticated, unsuspendFarmer);
 
-// ==================== Crop Batch Management ====================
-router.get("/crops", getAllCropBatches);
-router.get("/crops/farmer/:farmerId", getCropBatchesByFarmer);  // Must come before :id route
-router.get("/crops/:id", getCropBatchById);
-router.patch("/crops/:id", updateCropBatch);
-router.delete("/crops/:id", deleteCropBatch);
+// ==================== Crop Batch Management (auth required) ====================
+router.get("/crops", isAuthenticated, getAllCropBatches);
+router.get("/crops/farmer/:farmerId", isAuthenticated, getCropBatchesByFarmer);  // Must come before :id route
+router.get("/crops/:id", isAuthenticated, getCropBatchById);
+router.patch("/crops/:id", isAuthenticated, updateCropBatch);
+router.delete("/crops/:id", isAuthenticated, deleteCropBatch);
 
 export default router;
 

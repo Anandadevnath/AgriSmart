@@ -10,6 +10,8 @@ import chatRoute from "./routes/chatRoute.js";
 import marketPriceRoute from "./routes/marketPriceRoute.js";
 import adminRoute from "./routes/adminRoute.js";
 import pestRoute from "./routes/pestServer.js";
+import dataRoute from "./routes/dataRoute.js";
+import smartAlertRoute from "./routes/smartAlertRoute.js";
 import { initSocket } from "./socket.js";
 import { Buffer } from "buffer";
 
@@ -37,6 +39,8 @@ app.use("/chat", chatRoute);          // buyer <-> farmer chat (REST + socket)
 app.use("/market-price", marketPriceRoute); // live market price feed
 app.use("/panel", adminRoute);        // admin panel
 app.use("/", pestRoute);              // pest/disease identification helper
+app.use("/data", dataRoute);          // crop types / storage types / divisions reference data
+app.use("/api/smart-alert", smartAlertRoute); // LLM-powered Bangla smart alerts
 
 // -------------------- CROP DISEASE SCANNER (AI) --------------------
 

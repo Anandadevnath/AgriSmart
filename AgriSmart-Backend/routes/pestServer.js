@@ -8,7 +8,7 @@ const upload = multer({ dest: "uploads/" });
 
 // === CONFIG ===
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-const GEMINI_MODEL = "gemini-2.0-flash"; // change if needed
+const GEMINI_MODEL = "gemini-3.6-flash"; // gemini-2.0-flash was decommissioned; 3.6-flash is the current replacement
 const KB_PATH = path.join(process.cwd(), "server", "kb", "kb_index.json"); // optional
 
 // Helper: top-K search placeholder
@@ -129,6 +129,14 @@ Answer in Bangla, concise bullet points.
     fs.unlinkSync(imagePath);
   } catch (err) {
     console.error(err);
+    // Cleanup uploaded image so failed requests don't leave orphaned files in uploads/
+    try {
+      if (req.file?.path && fs.existsSync(req.file.path)) {
+        fs.unlinkSync(req.file.path);
+      }
+    } catch (cleanupErr) {
+      console.error("Failed to cleanup uploaded image:", cleanupErr);
+    }
     res.status(500).json({ error: "server_error", detail: String(err) });
   }
 });

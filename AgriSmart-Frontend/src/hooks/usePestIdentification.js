@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-const API_URL = "https://hackethon-server-side-br4m.vercel.app";
+const API_URL = import.meta.env.VITE_API_BASE || "http://localhost:8000";
 
 export const usePestIdentification = () => {
   const [loading, setLoading] = useState(false);

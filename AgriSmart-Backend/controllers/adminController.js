@@ -1,6 +1,7 @@
 import { Admin } from "../models/adminModel.js";
+import bcrypt from "bcryptjs";
 
-// Admin Registration - Simple (no hashing, no JWT)
+// Admin Registration
 export const registerAdmin = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -20,7 +21,8 @@ export const registerAdmin = async (req, res) => {
       });
     }
 
-    const newAdmin = await Admin.create({ email, password });
+    const hashedPassword = await bcrypt.hash(password, 12);
+    const newAdmin = await Admin.create({ email, password: hashedPassword });
 
     return res.status(201).json({
       success: true,
@@ -39,7 +41,7 @@ export const registerAdmin = async (req, res) => {
   }
 };
 
-// Admin Login - Simple (no JWT, just check email and password)
+// Admin Login
 export const loginAdmin = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -59,7 +61,8 @@ export const loginAdmin = async (req, res) => {
       });
     }
 
-    if (admin.password !== password) {
+    const isMatch = await bcrypt.compare(password, admin.password);
+    if (!isMatch) {
       return res.status(401).json({
         success: false,
         message: "Incorrect password"
