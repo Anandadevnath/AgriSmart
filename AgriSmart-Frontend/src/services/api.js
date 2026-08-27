@@ -1,12 +1,16 @@
 let API_BASE = '';
 
-// Allow override via localStorage for testing different backends
+// Priority: localStorage override → VITE_API_BASE env → localhost → Vercel deploy default
 if (typeof window !== 'undefined' && window.localStorage && window.localStorage.getItem('API_BASE')) {
   API_BASE = window.localStorage.getItem('API_BASE');
 } else if (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_BASE) {
   API_BASE = import.meta.env.VITE_API_BASE;
 } else if (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
   API_BASE = 'http://localhost:8000';
+} else if (typeof window !== 'undefined' && window.location.hostname.endsWith('.vercel.app')) {
+  // Deployed on Vercel but VITE_API_BASE not set in build env → use the known backend.
+  // Override with localStorage or Vercel env var to point elsewhere.
+  API_BASE = 'https://agrismart-backend-lac.vercel.app';
 } else {
   API_BASE = '';
 }
