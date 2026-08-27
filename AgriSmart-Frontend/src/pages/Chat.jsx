@@ -93,6 +93,21 @@ export default function Chat() {
 
   const meId = user?._id;
 
+  // --- load conversation list ---
+  const loadConversations = useCallback(async () => {
+    if (!meId) return;
+    setLoadingList(true);
+    try {
+      const token = localStorage.getItem("accessToken");
+      const { ok, data } = await api.get("/chat/conversations", { headers: { Authorization: `Bearer ${token}` } });
+      if (ok) setConversations(data?.data || []);
+    } catch (e) {
+      /* offline */
+    } finally {
+      setLoadingList(false);
+    }
+  }, [meId]);
+
   // --- socket lifecycle (connect ONCE per login, not per conversation switch) ---
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
@@ -139,21 +154,6 @@ export default function Chat() {
     activeRef.current = active;
     socketRef.current?.emit("conversation:join", active);
   }, [active]);
-
-  // --- load conversation list ---
-  const loadConversations = useCallback(async () => {
-    if (!meId) return;
-    setLoadingList(true);
-    try {
-      const token = localStorage.getItem("accessToken");
-      const { ok, data } = await api.get("/chat/conversations", { headers: { Authorization: `Bearer ${token}` } });
-      if (ok) setConversations(data?.data || []);
-    } catch (e) {
-      /* offline */
-    } finally {
-      setLoadingList(false);
-    }
-  }, [meId]);
 
   useEffect(() => { loadConversations(); }, [loadConversations]);
 
@@ -204,6 +204,38 @@ export default function Chat() {
     })();
     return () => { cancelled = true; };
   }, [active]);
+
+  // --- near-real-time fallback when the socket is not available (Vercel
+  // serverless has no WebSocket, so socketStatus stays "offline"). Poll the open
+  // conversation so the other participant's messages still appear — no manual
+  // refresh needed. Merges by id so optimistic ("tmp-") messages aren't lost. ---
+  useEffect(() => {
+    if (!active || socketStatus === "online") return;
+    const token = localStorage.getItem("accessToken");
+    let cancelled = false;
+
+    const poll = async () => {
+      try {
+        const { ok, data } = await api.get(`/chat/conversations/${active}/messages`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (!cancelled && ok) {
+          setMessages((prev) => {
+            const server = data?.data || [];
+            const serverIds = new Set(server.map((m) => String(m._id)));
+            const pending = prev.filter((m) => String(m._id).startsWith("tmp-"));
+            return [...server, ...pending.filter((m) => !serverIds.has(String(m._id)))];
+          });
+        }
+      } catch (e) {
+        /* ignore transient network failures */
+      }
+    };
+
+    poll();
+    const timer = setInterval(poll, 4000);
+    return () => { cancelled = true; clearInterval(timer); };
+  }, [active, socketStatus]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
