@@ -30,7 +30,12 @@ app.use(cors({
 }));
 
 // -------------------- DATABASE --------------------
-connectDB();
+// Fire-and-forget connection. The .catch() prevents an unhandled promise
+// rejection from crashing the process (serverless cold starts especially);
+// requests that need Mongo will fail with a clear error if it never connects.
+connectDB().catch((err) => {
+  console.error("MongoDB connection failed at startup:", err.message);
+});
 
 // -------------------- ROUTES --------------------
 app.use("/user", userRoute);          // auth & profile
@@ -122,11 +127,20 @@ app.get("/", (req, res) => {
 });
 
 // -------------------- START SERVER (with Socket.IO) --------------------
-const server = http.createServer(app);
-initSocket(server);
+// Vercel runs this file as a serverless function: it provides its own HTTP
+// runtime, so we must NOT call createServer/listen there. Only the plain
+// Express `app` (exported below) is invoked per request. Socket.IO needs a
+// long-lived HTTP server, so it's skipped on Vercel (the REST chat fallback
+// in /chat routes still works).
+const IS_VERCEL = !!process.env.VERCEL;
 
-server.listen(PORT, () => {
-  console.log(`AgriSmart BD server running on http://localhost:${PORT}`);
-});
+if (!IS_VERCEL) {
+  const server = http.createServer(app);
+  initSocket(server);
+
+  server.listen(PORT, () => {
+    console.log(`AgriSmart BD server running on http://localhost:${PORT}`);
+  });
+}
 
 export default app;

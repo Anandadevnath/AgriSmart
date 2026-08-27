@@ -4,7 +4,12 @@ import fs from "fs";
 import path from "path";
 
 const router = express.Router();
-const upload = multer({ dest: "uploads/" });
+// Memory storage: Vercel serverless functions have an ephemeral/read-only
+// filesystem, so we keep the uploaded image in RAM and never touch disk.
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10 MB
+});
 
 // === CONFIG ===
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
@@ -21,10 +26,8 @@ router.post("/api/pest-identify", upload.single("image"), async (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ error: "image required" });
 
-    const imagePath = req.file.path;
-
-    // 1️⃣ Convert image to base64
-    const imageBytes = fs.readFileSync(imagePath);
+    // 1️⃣ Convert image to base64 (buffer is in memory — no disk writes on Vercel)
+    const imageBytes = req.file.buffer;
     const imageBase64 = imageBytes.toString("base64");
 
     // 2️⃣ Load KB and pick top-K sources (optional)
@@ -125,18 +128,9 @@ Answer in Bangla, concise bullet points.
         : [],
     });
 
-    // 7️⃣ Cleanup uploaded image
-    fs.unlinkSync(imagePath);
+    // 7️⃣ (No filesystem cleanup needed — memory storage, no disk files)
   } catch (err) {
     console.error(err);
-    // Cleanup uploaded image so failed requests don't leave orphaned files in uploads/
-    try {
-      if (req.file?.path && fs.existsSync(req.file.path)) {
-        fs.unlinkSync(req.file.path);
-      }
-    } catch (cleanupErr) {
-      console.error("Failed to cleanup uploaded image:", cleanupErr);
-    }
     res.status(500).json({ error: "server_error", detail: String(err) });
   }
 });
