@@ -13,35 +13,39 @@ if (!cached) {
 }
 
 const connectDB = async () => {
-  if (cached.conn) {
-    // Already connected — reuse.
+  // Reuse a healthy connection only. readyState: 0=disconnected, 1=connected,
+  // 2=connecting, 3=disconnecting. On serverless the pooled connection can go
+  // stale between warm invocations, so we must reconnect rather than reuse a
+  // dead one (which would cause "buffering timed out" on the next query).
+  if (cached.conn && mongoose.connection.readyState === 1) {
     return cached.conn;
   }
+
+  // Missing or stale — reset so we reconnect fresh.
+  cached.conn = null;
+  cached.promise = null;
 
   const uri = process.env.MONGO_URI;
   if (!uri) throw new Error("MONGO_URI environment variable is missing");
 
-  if (!cached.promise) {
-    console.log("Attempting to connect to MongoDB...");
-    cached.promise = mongoose
-      .connect(`${uri}/note_app`, {
-        serverSelectionTimeoutMS: 5000,
-        // Mongoose's bufferCommands is left at the default (true) so
-        // queries during a brief reconnection window are queued rather
-        // than dropped. If you prefer fail-fast, set:
-        //   mongoose.set("bufferCommands", false);
-      })
-      .then((m) => {
-        console.log("MongoDB connected successfully");
-        return m;
-      })
-      .catch((err) => {
-        // Reset the promise so a future request retries the connection.
-        cached.promise = null;
-        console.error("MongoDB connection error:", err.message);
-        throw err;
-      });
-  }
+  console.log("Attempting to connect to MongoDB...");
+  cached.promise = mongoose
+    .connect(uri, {
+      serverSelectionTimeoutMS: 10000,
+      // Buffer commands during the brief connect window so a query made right
+      // after a cold start is queued rather than dropped. If you prefer
+      // fail-fast, set mongoose.set("bufferCommands", false) globally instead.
+    })
+    .then((m) => {
+      console.log("MongoDB connected successfully");
+      return m;
+    })
+    .catch((err) => {
+      // Reset the promise so a future request retries the connection.
+      cached.promise = null;
+      console.error("MongoDB connection error:", err.message);
+      throw err;
+    });
 
   cached.conn = await cached.promise;
   return cached.conn;
