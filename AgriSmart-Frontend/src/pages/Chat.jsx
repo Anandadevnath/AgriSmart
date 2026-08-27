@@ -84,14 +84,16 @@ export default function Chat() {
   const [loadingMsgs, setLoadingMsgs] = useState(false);
   const [typing, setTyping] = useState(false);
   const [search, setSearch] = useState("");
+  const [socketStatus, setSocketStatus] = useState("connecting"); // connecting | online | offline
   const socketRef = useRef(null);
   const typingTimeout = useRef(null);
   const bottomRef = useRef(null);
   const isTypingRef = useRef(false);
+  const activeRef = useRef(null); // latest active id, readable inside socket handlers
 
   const meId = user?._id;
 
-  // --- socket lifecycle ---
+  // --- socket lifecycle (connect ONCE per login, not per conversation switch) ---
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
     if (!token || !meId) return;
@@ -99,11 +101,14 @@ export default function Chat() {
     socketRef.current = sock;
 
     sock.on("connect", () => {
-      sock.emit("conversation:join", active);
+      setSocketStatus("online");
+      sock.emit("conversation:join", activeRef.current);
     });
+    sock.on("disconnect", () => setSocketStatus("offline"));
+    sock.on("connect_error", () => setSocketStatus("offline"));
 
     sock.on("message:new", (msg) => {
-      if (msg.conversationId === active) {
+      if (msg.conversationId === activeRef.current) {
         setMessages((prev) => (prev.some((m) => m._id === msg._id) ? prev : [...prev, msg]));
       }
       // refresh the conversation list preview
@@ -116,14 +121,22 @@ export default function Chat() {
       );
     });
 
+    // Re-fetch conversation list when backend signals an update (e.g. new message
+    // from the other participant changes the sort order).
+    sock.on("conversation:updated", () => {
+      loadConversations();
+    });
+
     sock.on("typing", ({ userId, isTyping }) => {
       if (userId !== meId) setTyping(isTyping);
     });
 
-    return () => { sock.disconnect(); socketRef.current = null; };
-  }, [meId, active]);
+    return () => { sock.disconnect(); socketRef.current = null; setSocketStatus("connecting"); };
+  }, [meId, loadConversations]);
 
+  // Keep activeRef in sync and re-join conversation room on switch.
   useEffect(() => {
+    activeRef.current = active;
     socketRef.current?.emit("conversation:join", active);
   }, [active]);
 
@@ -214,16 +227,39 @@ export default function Chat() {
     };
     setMessages((prev) => [...prev, optimistic]);
 
-    const ack = ({ ok, data, error }) => {
-      if (!ok) {
-        setMessages((prev) => prev.filter((m) => m._id !== optimistic._id));
-        toast.error(error || (isBn ? "বার্তা পাঠানো যায়নি" : "Could not send message"));
+    const removeOptimistic = () => setMessages((prev) => prev.filter((m) => m._id !== optimistic._id));
+    const replaceOptimistic = (data) => setMessages((prev) => prev.map((m) => (m._id === optimistic._id ? data : m)));
+
+    // Fast path: real-time socket connected → emit with ack.
+    if (socketRef.current?.connected) {
+      socketRef.current.emit("message:send", { conversationId: active, text: t }, ({ ok, data, error }) => {
+        if (!ok) {
+          removeOptimistic();
+          toast.error(error || (isBn ? "বার্তা পাঠানো যায়নি" : "Could not send message"));
+        } else {
+          // replace optimistic with server version
+          replaceOptimistic(data);
+        }
+      });
+      return;
+    }
+
+    // Fallback: socket offline (Vercel serverless has no WebSocket) → REST.
+    try {
+      const token = localStorage.getItem("accessToken");
+      const { ok, data } = await api.post(`/chat/conversations/${active}/messages`, { text: t }, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (ok) {
+        replaceOptimistic(data?.data);
       } else {
-        // replace optimistic with server version
-        setMessages((prev) => prev.map((m) => (m._id === optimistic._id ? data : m)));
+        removeOptimistic();
+        toast.error(isBn ? "বার্তা পাঠানো যায়নি" : "Could not send message");
       }
-    };
-    socketRef.current?.emit("message:send", { conversationId: active, text: t }, ack);
+    } catch (e) {
+      removeOptimistic();
+      toast.error(isBn ? "বার্তা পাঠানো যায়নি" : "Could not send message");
+    }
   };
 
   const onTyping = (val) => {
@@ -413,6 +449,13 @@ export default function Chat() {
                     </>
                   )}
                 </div>
+
+                {socketStatus === "offline" && (
+                  <div className="px-5 py-2 bg-amber-50 border-t border-amber-100 text-[12px] text-amber-700 flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-amber-400 shrink-0" />
+                    {isBn ? "রিয়েল-টাইম সংযোগ নেই — বার্তা সার্ভারের মাধ্যমে যাবে।" : "Real-time unavailable — messages send via server."}
+                  </div>
+                )}
 
                 {/* Composer */}
                 <div className="p-4 border-t border-green-100 bg-white flex items-end gap-2">

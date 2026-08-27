@@ -7,10 +7,13 @@ import { toast } from "react-hot-toast";
 import {
   LayoutDashboard, Plus, Package, Wallet, TrendingUp, Trash2, CheckCircle2,
   Clock, ScanLine, Store, Lightbulb, ArrowUpRight, ArrowDownRight, Minus, MapPin,
+  MessageSquareWarning, Send, Phone, Loader2,
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { useLanguage } from "../context/LanguageContext";
 import api from "../services/api";
+import { sendEmergencySms } from "../services/smartAlertService";
+import { generateBanglaSmartAlert } from "../utils/riskEngine";
 import { cropLabel, cropBannerColor } from "../data/bangladesh";
 import { FARMING_TIPS } from "../data/farmingTips";
 
@@ -35,6 +38,7 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [prices, setPrices] = useState([]);
   const [showSold, setShowSold] = useState(true);
+  const [smsSending, setSmsSending] = useState(false);
 
   // Load my listings
   useEffect(() => {
@@ -109,6 +113,33 @@ export default function Dashboard() {
   };
 
   const maxPrice = Math.max(...prices.map((p) => p.pricePerKg), 1);
+
+  // Compose a sample critical Bangla alert and send it to the farmer's own phone.
+  const handleTestSms = async () => {
+    const phone = user?.phone;
+    if (!phone) {
+      toast.error(isBn ? "প্রোফাইলে ফোন নম্বর নেই" : "No phone number on profile");
+      return;
+    }
+    setSmsSending(true);
+    try {
+      const message = generateBanglaSmartAlert({
+        cropType: "Rice",
+        cropBn: "ধান",
+        storageType: "Warehouse",
+        storageBn: "গুদাম",
+        riskLevel: "Critical",
+        riskBn: "সংকটপূর্ণ",
+        etcl: 12,
+        humidity: 90,
+        rainProb: 80,
+        temperature: 34,
+      });
+      await sendEmergencySms({ to: phone, message });
+    } finally {
+      setSmsSending(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-[#f2faf5]">
@@ -300,6 +331,38 @@ export default function Dashboard() {
               <Link to="/prices" className="inline-block mt-4 text-[13px] font-bold text-[#0b6b3a] hover:underline">
                 {isBn ? "সম্পূর্ণ দাম দেখুন →" : "View full prices →"}
               </Link>
+            </motion.div>
+
+            {/* Emergency SMS */}
+            <motion.div variants={fadeUp} initial="hidden" animate="show"
+              className="bg-white rounded-3xl border border-green-100 shadow-[0_6px_24px_rgba(0,60,30,0.07)] p-6">
+              <div className="flex items-center justify-between mb-1">
+                <h2 className="text-lg font-extrabold text-green-950 inline-flex items-center gap-2">
+                  <MessageSquareWarning size={18} className="text-[#0b6b3a]" />
+                  {isBn ? "জরুরি এসএমএস সতর্কতা" : "Emergency SMS Alert"}
+                </h2>
+                <span className="text-[10.5px] font-bold px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200">
+                  {isBn ? "পরীক্ষা" : "Test"}
+                </span>
+              </div>
+              <p className="text-[12.5px] text-green-700/70 mb-3">
+                {isBn ? "সংকটপূর্ণ পরিস্থিতিতে ফসলের জরুরি সতর্কতা সরাসরি আপনার ফোনে এসএমএসে পৌঁছে যায়।" : "Emergency crop alerts go straight to your phone as SMS in a critical situation."}
+              </p>
+              <div className="flex items-center gap-2 text-[13px] text-green-800 bg-green-50 border border-green-100 rounded-xl px-3 py-2.5 mb-3">
+                <Phone size={14} className="text-[#0b6b3a]" />
+                <span className="font-bold">{user?.phone || (isBn ? "নম্বর নেই" : "No phone")}</span>
+              </div>
+              <button
+                onClick={handleTestSms}
+                disabled={smsSending}
+                className="w-full inline-flex items-center justify-center gap-2 bg-[#0b6b3a] text-white rounded-xl px-4 py-2.5 font-bold text-sm hover:bg-[#085b30] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {smsSending ? <Loader2 size={15} className="animate-spin" /> : <Send size={15} />}
+                {isBn ? "পরীক্ষামূলক এসএমএস পাঠান" : "Send test SMS"}
+              </button>
+              <p className="mt-3 text-[11px] text-green-500 leading-relaxed">
+                {isBn ? "এসএমএস গেটওয়ে কনফিগার না থাকলে এটি ডেমো হিসাবে দেখানো হবে, আসল এসএমএস নয়।" : "Without a gateway configured this is a demo alert, not a real SMS."}
+              </p>
             </motion.div>
 
             {/* Tip of the day */}

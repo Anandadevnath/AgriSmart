@@ -2,6 +2,7 @@
 // Smart Alert Service - Combines Crop + Weather + Risk for Bangla Alerts
 
 import api from './api';
+import { toast } from 'react-hot-toast';
 
 /**
  * Generate a smart Bangla alert for a crop batch
@@ -113,6 +114,41 @@ function showBrowserNotification(alertData) {
     tag: 'critical-alert',
     requireInteraction: true
   });
+}
+
+/**
+ * Send an emergency SMS via the backend gateway (or demo fallback).
+ * On success shows a toast; on demo fallback also shows a browser notification.
+ * @param {string} to - Phone number in local format (e.g. 01812345678)
+ * @param {string} message - SMS text content
+ */
+export async function sendEmergencySms({ to, message }) {
+  try {
+    const { ok, data } = await api.post('/api/smart-alert/sms', { to, message });
+    if (!ok) {
+      toast.error('SMS failed to send');
+      return { sent: false };
+    }
+    if (data.simulated) {
+      toast.success('📱 SMS sent (demo — no gateway configured)', { duration: 4000 });
+      // Also show a browser notification so the user gets the experience
+      if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
+        new Notification('📱 AgriSmart SMS (Demo)', {
+          body: `To: ${to}\n${message.slice(0, 80)}…`,
+        });
+      }
+      return { sent: false, simulated: true };
+    }
+    if (data.sent) {
+      toast.success(`📱 SMS sent to ${to}`, { duration: 4000 });
+      return { sent: true };
+    }
+    toast.error('SMS delivery failed');
+    return { sent: false };
+  } catch (e) {
+    toast.error('SMS service unavailable');
+    return { sent: false };
+  }
 }
 
 /**
@@ -231,6 +267,7 @@ export async function generateAlertsFromRiskData(riskResults, weatherData = {}) 
 export default {
   generateSmartAlert,
   simulateSMSNotification,
+  sendEmergencySms,
   generateAlertsFromRiskData
 };
 

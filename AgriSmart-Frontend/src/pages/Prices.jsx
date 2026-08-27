@@ -72,27 +72,44 @@ export default function Prices() {
   const district = user?.location?.district;
 
   const [prices, setPrices] = useState([]);
+  const [updatedAt, setUpdatedAt] = useState(null); // server feed timestamp
   const [loadingPrices, setLoadingPrices] = useState(true);
   const [search, setSearch] = useState("");
   const [view, setView] = useState("all"); // all | rice | vegetables | fruits | other
 
   const { weather, loading: weatherLoading } = useWeatherSnapshot(district);
 
-  // Fetch prices
+  // Fetch prices, then poll every 60s so the numbers visibly move.
   useEffect(() => {
     let cancelled = false;
-    (async () => {
+    const fetchPrices = async () => {
       try {
         const { ok, data } = await api.get("/market-price");
-        if (ok && data?.data && !cancelled) setPrices(data.data);
+        if (!cancelled && ok && data?.data) {
+          setPrices(data.data);
+          setUpdatedAt(data.updatedAt ? new Date(data.updatedAt) : new Date());
+        }
       } catch (e) {
         /* offline */
       } finally {
         if (!cancelled) setLoadingPrices(false);
       }
-    })();
-    return () => { cancelled = true; };
+    };
+    fetchPrices();
+    const timer = setInterval(fetchPrices, 60 * 1000);
+    return () => { cancelled = true; clearInterval(timer); };
   }, []);
+
+  // Re-render the "updated X min ago" label every 30s (no refetch needed).
+  const [, setNowTick] = useState(0);
+  useEffect(() => {
+    const t = setInterval(() => setNowTick((x) => x + 1), 30 * 1000);
+    return () => clearInterval(t);
+  }, []);
+
+  const updatedMins = updatedAt
+    ? Math.max(0, Math.floor((Date.now() - updatedAt.getTime()) / 60000))
+    : null;
 
   // Categories
   const CAT_MAP = {
@@ -243,6 +260,24 @@ export default function Prices() {
                 className="w-full rounded-xl border border-green-200 bg-green-50/50 pl-9 pr-3 py-2.5 text-sm text-green-950 placeholder:text-green-400 focus:outline-none focus:ring-2 focus:ring-[#49c74f]/40 transition"
               />
             </div>
+          </div>
+
+          {/* Live status */}
+          <div className="px-6 pb-3 flex items-center gap-2">
+            <span className="inline-flex items-center gap-1.5 text-[11px] font-bold px-2.5 py-1 rounded-full bg-green-100 text-green-800 border border-green-200">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-500 opacity-75" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-green-600" />
+              </span>
+              LIVE
+            </span>
+            <span className="text-[11.5px] text-green-600">
+              {updatedMins === null
+                ? (isBn ? "আপডেট হচ্ছে…" : "Updating…")
+                : updatedMins === 0
+                  ? (isBn ? "এইমাত্র আপডেট হয়েছে" : "Updated just now")
+                  : (isBn ? `${updatedMins} মিনিট আগে আপডেট` : `Updated ${updatedMins} min ago`)}
+            </span>
           </div>
 
           {/* Table */}
