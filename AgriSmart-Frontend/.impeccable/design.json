@@ -1,0 +1,323 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-08-27T00:00:00Z",
+  "title": "Design System: AgriSmart BD",
+  "extensions": {
+    "colorMeta": {
+      "forest-ink": {
+        "role": "primary",
+        "displayName": "Forest Ink",
+        "canonical": "#0b3b2a",
+        "tonalRamp": [
+          "#001206",
+          "#072c1f",
+          "#2b493c",
+          "#4d685c",
+          "#6e8a7d",
+          "#8cae9e",
+          "#acd4c1",
+          "#cefbe5"
+        ]
+      },
+      "leaf-lime": {
+        "role": "primary",
+        "displayName": "Leaf Lime",
+        "canonical": "#7cc24a",
+        "tonalRamp": [
+          "#001400",
+          "#003100",
+          "#214f00",
+          "#466e29",
+          "#66914b",
+          "#84b664",
+          "#a2dd7d",
+          "#c2ff98"
+        ]
+      },
+      "mist-ground": {
+        "role": "neutral",
+        "displayName": "Mist Ground",
+        "canonical": "#f6f8f5",
+        "tonalRamp": [
+          "#0a0c0a",
+          "#242623",
+          "#414340",
+          "#60625f",
+          "#818380",
+          "#a4a6a3",
+          "#c8cac7",
+          "#edefec"
+        ]
+      },
+      "sage-hairline": {
+        "role": "neutral",
+        "displayName": "Sage Hairline",
+        "canonical": "#e4eae3",
+        "tonalRamp": [
+          "#090c08",
+          "#232622",
+          "#40433f",
+          "#5f625e",
+          "#80837f",
+          "#a2a6a1",
+          "#c6cbc5",
+          "#ebf0ea"
+        ]
+      },
+      "stone-slate": {
+        "role": "neutral",
+        "displayName": "Stone Slate",
+        "canonical": "#9aa79e",
+        "tonalRamp": [
+          "#060d08",
+          "#1f2722",
+          "#3c443f",
+          "#5c635e",
+          "#7d857f",
+          "#9ea8a1",
+          "#c1ccc5",
+          "#e6f2e9"
+        ]
+      },
+      "stone-moss": {
+        "role": "neutral",
+        "displayName": "Stone Moss",
+        "canonical": "#6f7d73",
+        "tonalRamp": [
+          "#050e07",
+          "#1e2821",
+          "#3b453e",
+          "#5b645e",
+          "#7c857e",
+          "#9da8a0",
+          "#c0cdc4",
+          "#e4f3e8"
+        ]
+      },
+      "stone-soil": {
+        "role": "neutral",
+        "displayName": "Stone Soil",
+        "canonical": "#47564c",
+        "tonalRamp": [
+          "#040e07",
+          "#1d2821",
+          "#3a453e",
+          "#5a645d",
+          "#7b857e",
+          "#9ca9a0",
+          "#bfcdc4",
+          "#e3f3e8"
+        ]
+      },
+      "near-black": {
+        "role": "neutral",
+        "displayName": "Near Black",
+        "canonical": "#14231b",
+        "tonalRamp": [
+          "#030e08",
+          "#1c2822",
+          "#3a453f",
+          "#59645e",
+          "#7a867f",
+          "#9ba9a1",
+          "#becec4",
+          "#e2f4e9"
+        ]
+      },
+      "on-primary": {
+        "role": "neutral",
+        "displayName": "On Primary",
+        "canonical": "#ffffff",
+        "tonalRamp": [
+          "#0c0b09",
+          "#262522",
+          "#43423f",
+          "#62615e",
+          "#83827f",
+          "#a6a5a1",
+          "#cac9c5",
+          "#f0eeeb"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Hero and section headlines; Sora extrabold, tight tracking."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Paragraph copy, captions, meta; Hind Siliguri at 15px/1.8."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Kickers, eyebrows, section labels; 13px uppercase with 0.08em tracking."
+      }
+    },
+    "shadows": [
+      {
+        "name": "button-primary",
+        "value": "0 2px 10px rgba(11,59,42,0.18)",
+        "purpose": "Ambient shadow under primary buttons; deepens on hover."
+      },
+      {
+        "name": "button-accent",
+        "value": "0 2px 10px rgba(124,194,74,0.35)",
+        "purpose": "Soft lime glow under accent buttons; deepens on hover."
+      },
+      {
+        "name": "nav-scrolled",
+        "value": "0 8px 24px -12px rgba(11,59,42,0.25)",
+        "purpose": "Soft drop under the navbar when scrolled (non-design pages)."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease-spring",
+        "value": "spring(320, 22)",
+        "purpose": "Button hover lift / tap scale."
+      },
+      {
+        "name": "ease-reveal",
+        "value": "easeOut 0.6-0.7s",
+        "purpose": "Scroll-into-view fade-up for sections and panels."
+      },
+      {
+        "name": "ease-stagger",
+        "value": "staggerChildren 0.1",
+        "purpose": "Staggered entrance of hero copy blocks."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "sm",
+        "value": "640px"
+      },
+      {
+        "name": "md",
+        "value": "768px"
+      },
+      {
+        "name": "lg",
+        "value": "1024px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The default action — ink fill, white text, soft ambient shadow.",
+      "html": "<button class=\"ds-btn ds-btn-primary\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M3 7V5a2 2 0 0 1 2-2h2\"/><path d=\"M17 3h2a2 2 0 0 1 2 2v2\"/><path d=\"M21 17v2a2 2 0 0 1-2 2h-2\"/><path d=\"M7 21H5a2 2 0 0 1-2-2v-2\"/></svg> Scan Your Crop</button>",
+      "css": ".ds-btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;border:none;cursor:pointer;font-family:\"Sora\",\"Hind Siliguri\",system-ui,sans-serif;font-weight:700;font-size:15px;letter-spacing:-0.01em;border-radius:14px;padding:14px 32px;transition:all .3s;}.ds-btn-primary{background:#0b3b2a;color:#fff;box-shadow:0 2px 10px rgba(11,59,42,.18);}.ds-btn-primary:hover{background:#0d4a34;transform:translateY(-1px);box-shadow:0 4px 16px rgba(11,59,42,.26);}.ds-btn-primary:focus-visible{outline:2px solid #7cc24a;outline-offset:2px;}"
+    },
+    {
+      "name": "Accent Button",
+      "kind": "button",
+      "refersTo": "button-accent",
+      "description": "The leaf-lime action — used inside ink panels and the closing CTA.",
+      "html": "<button class=\"ds-btn ds-btn-accent\">Get Started Now<svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M5 12h14\"/><path d=\"m12 5 7 7-7 7\"/></svg></button>",
+      "css": ".ds-btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;border:none;cursor:pointer;font-family:\"Sora\",\"Hind Siliguri\",system-ui,sans-serif;font-weight:700;font-size:15px;letter-spacing:-0.01em;border-radius:14px;padding:14px 32px;transition:all .3s;}.ds-btn-accent{background:#7cc24a;color:#0b3b2a;box-shadow:0 2px 10px rgba(124,194,74,.35);}.ds-btn-accent:hover{background:#8ed25e;transform:translateY(-1px);box-shadow:0 4px 18px rgba(124,194,74,.4);}.ds-btn-accent:focus-visible{outline:2px solid #0b3b2a;outline-offset:2px;}"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Quiet companion to primary — hairline border, ink text, transparent fill.",
+      "html": "<button class=\"ds-btn ds-btn-secondary\">Explore Marketplace<svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M5 12h14\"/><path d=\"m12 5 7 7-7 7\"/></svg></button>",
+      "css": ".ds-btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;border:none;cursor:pointer;font-family:\"Sora\",\"Hind Siliguri\",system-ui,sans-serif;font-weight:700;font-size:15px;letter-spacing:-0.01em;border-radius:14px;padding:14px 32px;transition:all .3s;}.ds-btn-secondary{background:transparent;color:#0b3b2a;box-shadow:inset 0 0 0 1px rgba(11,59,42,.25);}.ds-btn-secondary:hover{box-shadow:inset 0 0 0 1px #0b3b2a;background:rgba(11,59,42,.05);}.ds-btn-secondary:focus-visible{outline:2px solid #7cc24a;outline-offset:2px;}"
+    },
+    {
+      "name": "Text Input",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Neutral bordered field with a leaf-lime focus ring.",
+      "html": "<input class=\"ds-input\" type=\"email\" placeholder=\"farmer@example.com\" value=\"\"/>",
+      "css": ".ds-input{width:100%;box-sizing:border-box;border:1px solid #e4eae3;background:#fff;color:#0b3b2a;border-radius:12px;padding:12px 16px;font-family:\"Hind Siliguri\",system-ui,sans-serif;font-size:15px;transition:border-color .2s,box-shadow .2s;}.ds-input::placeholder{color:#9aa79e;}.ds-input:focus{outline:none;border-color:#7cc24a;box-shadow:0 0 0 2px rgba(124,194,74,.2);}"
+    },
+    {
+      "name": "Navigation Bar",
+      "kind": "nav",
+      "refersTo": "nav",
+      "description": "Always-fixed mist navbar: ink logo tile, semibold links, lime login chip.",
+      "html": "<nav class=\"ds-nav\"><a class=\"ds-logo\"><span class=\"ds-logo-tile\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z\"/><path d=\"M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12\"/></svg></span><span class=\"ds-logo-text\">AgriSmart<sup>BD</sup></span></a><div class=\"ds-links\"><a>Marketplace</a><a>Chat</a><a>Prices</a><a>Scan Crop</a><a>About</a></div><a class=\"ds-login\">Login</a></nav>",
+      "css": ".ds-nav{display:flex;align-items:center;justify-content:space-between;gap:24px;min-height:72px;padding:0 24px;background:rgba(246,248,245,.9);backdrop-filter:blur(12px);border-bottom:1px solid rgba(11,59,42,.08);font-family:\"Hind Siliguri\",system-ui,sans-serif;}.ds-logo{display:inline-flex;align-items:center;gap:10px;text-decoration:none;}.ds-logo-tile{width:32px;height:32px;border-radius:10px;background:#0b3b2a;color:#7cc24a;display:flex;align-items:center;justify-content:center;}.ds-logo-text{font-family:\"Sora\",\"Hind Siliguri\",sans-serif;font-weight:800;font-size:20px;color:#0b3b2a;}.ds-logo-text sup{font-size:12px;color:#6f7d73;margin-left:2px;}.ds-links{display:flex;gap:28px;align-items:center;}.ds-links a{font-size:14px;font-weight:600;color:#0b3b2a;text-decoration:none;transition:color .2s;}.ds-links a:hover{color:#7cc24a;}.ds-login{background:#7cc24a;color:#0b3b2a;font-size:14px;font-weight:700;border-radius:12px;padding:10px 20px;text-decoration:none;transition:background .2s;}.ds-login:hover{background:#8ed25e;}"
+    },
+    {
+      "name": "Kicker / Eyebrow",
+      "kind": "chip",
+      "refersTo": "label",
+      "description": "Uppercase 13px section opener — ink text, a small lime dot or icon lead.",
+      "html": "<div class=\"ds-kicker\"><span class=\"ds-kicker-dot\"></span>Core capabilities</div>",
+      "css": ".ds-kicker{display:inline-flex;align-items:center;gap:8px;font-family:\"Hind Siliguri\",system-ui,sans-serif;font-weight:700;font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:#0b3b2a;}.ds-kicker-dot{width:8px;height:8px;border-radius:999px;background:#7cc24a;display:inline-block;}"
+    },
+    {
+      "name": "Feature Card",
+      "kind": "card",
+      "refersTo": "feature-card",
+      "description": "Hairline-ruled ledger cell — white on mist, lime icon tile, no shadow.",
+      "html": "<div class=\"ds-card\"><span class=\"ds-card-icon\"><svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M3 7V5a2 2 0 0 1 2-2h2\"/><path d=\"M17 3h2a2 2 0 0 1 2 2v2\"/><path d=\"M21 17v2a2 2 0 0 1-2 2h-2\"/><path d=\"M7 21H5a2 2 0 0 1-2-2v-2\"/></svg></span><h3 class=\"ds-card-title\">Crop Disease Check by Photo</h3><p class=\"ds-card-body\">Use your smartphone camera to detect crop diseases instantly and get simple solutions.</p></div>",
+      "css": ".ds-card{background:#fff;padding:28px 24px;font-family:\"Hind Siliguri\",system-ui,sans-serif;}.ds-card-icon{width:44px;height:44px;border-radius:10px;background:rgba(124,194,74,.15);color:#7cc24a;display:flex;align-items:center;justify-content:center;margin-bottom:18px;}.ds-card-title{font-family:\"Sora\",\"Hind Siliguri\",sans-serif;font-weight:700;font-size:18px;color:#0b3b2a;margin:0 0 8px;letter-spacing:-.01em;}.ds-card-body{font-size:15px;line-height:1.8;color:#47564c;margin:0;}"
+    },
+    {
+      "name": "Ledger Stat Row",
+      "kind": "custom",
+      "refersTo": "stat-row",
+      "description": "Numbers as ledger entries under a hairline rule.",
+      "html": "<div class=\"ds-ledger\"><div class=\"ds-stat\"><div class=\"ds-stat-num\">10K+</div><div class=\"ds-stat-label\">Crops scanned</div></div><div class=\"ds-stat\"><div class=\"ds-stat-num\">৳50Cr+</div><div class=\"ds-stat-label\">Fair price secured</div></div></div>",
+      "css": ".ds-ledger{display:flex;gap:40px;flex-wrap:wrap;border-top:1px solid rgba(11,59,42,.08);padding-top:28px;max-width:560px;font-family:\"Hind Siliguri\",system-ui,sans-serif;}.ds-stat-num{font-family:\"Sora\",\"Hind Siliguri\",sans-serif;font-weight:800;font-size:26px;color:#0b3b2a;font-variant-numeric:tabular-nums;}.ds-stat-label{font-size:13px;font-weight:500;color:#6f7d73;margin-top:2px;}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Field Ledger",
+    "overview": "AgriSmart BD is built like a careful farmer's ledger kept in a clean field office: deep forest ink marks on near-white harvest paper, everything ruled with hairline lines, and exactly one leaf-lime accent where the hand reaches to act. The world refuses the category's saturated greens and rounded-card softness in favor of an editorial, evidence-first voice — numbers stand in tabular rows, live data reads like a snapshot you can trust, and the interface stays quiet so the farm's own facts carry the authority. The layout is open and airy: generous section padding (96px), a centered 1280px stage, and editorial left-aligned columns capped near 60ch. Density concentrates only inside data panels — the live weather snapshot, price tables, the feature grid — where hairline rules and tabular numerals do the organizing. Motion is restrained: content eases up as it scrolls into view, and buttons answer hover with a one-pixel spring lift.",
+    "keyCharacteristics": [
+      "Deep forest ink (#0b3b2a) on a near-white harvest ground (#f6f8f5); one leaf-lime action color (#7cc24a) used sparingly",
+      "Hairline borders instead of shadows — flat, ruled, legible",
+      "Editorial display type (Sora) over a warm humanist body (Hind Siliguri); Bengali and English share one system",
+      "Uppercase letter-spaced kickers and eyebrows; Lucide line icons only, never emoji",
+      "Numbers are always tabular; live data always labeled",
+      "Rounding is softly geometric (8–18px), never pill-shaped except tiny meta chips"
+    ],
+    "rules": [
+      {
+        "name": "The One Accent Rule",
+        "body": "Leaf lime appears on a small minority of any screen — an action, a live marker, a focus ring. If a layout leans on lime as a fill, the accent has lost its job.",
+        "section": "colors"
+      },
+      {
+        "name": "The Ink Anchor Rule",
+        "body": "The heaviest moments are ink, not accent: the hero snapshot panel, the CTA band, and the footer all rest on forest ink with white text and a faint lime glow. Dark closes the loop; light opens it.",
+        "section": "colors"
+      },
+      {
+        "name": "The Kicker Rule",
+        "body": "Uppercase labels at 13px with 0.08em tracking open every major block. They are text, not chips: no fill, no border, just ink on the ground with a small lime dot or icon where rhythm needs one.",
+        "section": "typography"
+      },
+      {
+        "name": "The Tabular Ledger Rule",
+        "body": "Every number a farmer might compare — temps, prices, stats — uses tabular numerals so columns line up like a ledger.",
+        "section": "typography"
+      }
+    ],
+    "dos": [
+      "Do set ink (#0b3b2a) text and headings on the mist ground; reserve white for on-ink.",
+      "Do use hairline borders (#e4eae3 or white/10) to separate cards and grids instead of drop shadows.",
+      "Do keep numbers tabular and label live data (\"LIVE\", \"Today's Snapshot\") so the platform reads as evidence.",
+      "Do open blocks with uppercase letter-spaced kickers.",
+      "Do use Lucide line icons; a 20px lime-tinted icon tile is the house way to lead a bullet.",
+      "Do keep the login/register split: ink brand panel beside a clean bordered form, lime focus rings."
+    ],
+    "donts": [
+      "Don't use emoji anywhere — icons are Lucide line glyphs only.",
+      "Don't float badges, pills, or info cards over content; surfaces belong to the page flow (a footer tagline chip is an exception only inside the footer).",
+      "Don't decorate with gradients — the only fills are flat ink, lime, white, and faint blur-3xl radial atmosphere inside ink panels.",
+      "Don't reach for saturated green fills or heavy rounded-card shadows; the category's generic agri look is this world's explicit anti-reference.",
+      "Don't use a stock-photo hero with a dark overlay; proof is live data, not imagery.",
+      "Don't let the lime accent fill whole sections — its rarity is the point.",
+      "Don't invent new palette entries; the ink/lime/neutral system above is closed."
+    ]
+  }
+}

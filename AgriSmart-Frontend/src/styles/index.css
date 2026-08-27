@@ -2,26 +2,71 @@
 
 /* ============================================================
    AgriSmart BD — global tokens & base styles
+   Direction: "Modern agri-tech" — deep forest ink on clean
+   near-white ground, one leaf-lime action color, hairline
+   borders instead of shadows, editorial type.
    ============================================================ */
 :root {
-  --color-brand-primary: #0b6b3a;        /* deep harvest green */
-  --color-brand-secondary: #ffffff;      /* on-primary text */
-  --color-brand-button-primary: #0b6b3a;
-  --color-brand-button-outline: #0b6b3a;
-  --color-brand-highlight: #49c74f;      /* bright green accent */
-  --color-brand-neutral-100: #f4faf6;
-  --color-brand-neutral-200: #dcebe2;
-  --color-brand-neutral-400: #9db4a6;
-  --color-brand-neutral-500: #6f8b7b;
-  --color-brand-neutral-600: #4a6154;
+  --color-brand-primary: #0b3b2a;      /* deep forest ink */
+  --color-brand-secondary: #ffffff;    /* on-primary text */
+  --color-brand-button-primary: #0b3b2a;
+  --color-brand-button-outline: #0b3b2a;
+  --color-brand-highlight: #7cc24a;    /* leaf lime accent */
+  --color-brand-amber: #e0a63c;        /* warm harvest amber */
+  --color-brand-neutral-100: #f6f8f5;
+  --color-brand-neutral-200: #e4eae3;
+  --color-brand-neutral-400: #9aa79e;
+  --color-brand-neutral-500: #6f7d73;
+  --color-brand-neutral-600: #47564c;
+
+  --font-display: "Sora", "Hind Siliguri", system-ui, sans-serif;
+  --font-body: "Hind Siliguri", system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 
 /* Prevent accidental horizontal overflow across the site */
 html, body, #root {
-	overflow-x: hidden;
+  overflow-x: hidden;
 }
 
 /* Smooth scrolling for in-page anchors */
 html {
   scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-body);
+  color: #14231b;
+  background: var(--color-brand-neutral-100);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  letter-spacing: -0.02em;
+}
+
+/* Numerals in tabular data line up */
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---- Browser surfaces the design also owns ---- */
+::selection {
+  background: var(--color-brand-primary);
+  color: #eafff0;
+}
+
+html {
+  scrollbar-color: var(--color-brand-neutral-400) transparent;
+}
+
+*:focus-visible {
+  outline: 2px solid var(--color-brand-highlight);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+input, select, textarea {
+  caret-color: var(--color-brand-primary);
 }

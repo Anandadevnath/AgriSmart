@@ -3,11 +3,16 @@ import { motion } from "framer-motion";
 
 export const StatItem = ({ value, label, subLabel }) => (
   <motion.div
-    whileHover={{ scale: 1.05 }}
-    className="bg-white/80 backdrop-blur rounded-3xl p-6 shadow-sm border border-green-100 text-center"
+    initial={{ opacity: 0, y: 12 }}
+    whileInView={{ opacity: 1, y: 0 }}
+    viewport={{ once: true, amount: 0.4 }}
+    transition={{ duration: 0.5, ease: "easeOut" }}
+    className="text-center sm:text-left px-2"
   >
-    <div className="text-4xl font-extrabold text-green-900 mb-2">{value}</div>
-    <div className="text-sm font-semibold text-green-800">{label}</div>
-    <div className="text-xs text-green-600 mt-1">{subLabel}</div>
+    <div className="font-display font-extrabold text-[#0b3b2a] text-4xl md:text-[42px] tracking-[-0.02em] tabular mb-1.5">
+      {value}
+    </div>
+    <div className="text-sm font-bold text-[#0b3b2a]">{label}</div>
+    <div className="text-[13px] text-[#6f7d73] mt-0.5">{subLabel}</div>
   </motion.div>
 );

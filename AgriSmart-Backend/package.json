@@ -1,5 +1,5 @@
 {
-  "name": "noteapp_backend",
+  "name": "agrismart-backend",
   "version": "1.0.0",
   "engines": {
     "node": "20.18.0"

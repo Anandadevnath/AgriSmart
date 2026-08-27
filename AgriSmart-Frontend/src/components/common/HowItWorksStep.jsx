@@ -1,15 +1,24 @@
 import React from "react";
 import { motion } from "framer-motion";
 
-export const HowItWorksStep = ({ id, icon, title, desc, img }) => (
-  <motion.div whileHover={{ scale: 1.05, y: -5 }} transition={{ type: "spring", stiffness: 120 }} className="bg-white rounded-2xl shadow-[0_15px_40px_rgba(0,70,40,0.10)] overflow-hidden border border-[#e3f7ec]">
-    <div className="h-40 bg-cover bg-center relative" style={{ backgroundImage: `url(${img})` }}>
-      <div className="absolute right-3 top-3 w-11 h-11 rounded-full bg-white shadow-lg flex items-center justify-center text-[#0d6b3c] font-bold text-lg">{id}</div>
+export const HowItWorksStep = ({ id, icon: Icon, title, desc, delay }) => (
+  <motion.div
+    initial={{ opacity: 0, y: 20 }}
+    whileInView={{ opacity: 1, y: 0 }}
+    viewport={{ once: true, amount: 0.3 }}
+    transition={{ type: "spring", stiffness: 150, damping: 20, delay }}
+    whileHover={{ y: -4 }}
+    className="relative border border-[#e4eae3] rounded-[16px] p-6 pt-7 bg-[#f6f8f5] h-full"
+  >
+    <div className="flex items-start justify-between mb-5">
+      <span className="w-11 h-11 rounded-[10px] bg-[#0b3b2a] text-[#7cc24a] flex items-center justify-center">
+        <Icon className="w-5 h-5" strokeWidth={2.1} />
+      </span>
+      <span className="font-display font-extrabold text-[#0b3b2a]/20 text-3xl tabular leading-none">
+        {String(id).padStart(2, '0')}
+      </span>
     </div>
-    <div className="p-6">
-      <div className="text-3xl mb-2">{icon}</div>
-      <h3 className="font-bold text-[18px] text-[#0c3e25] mb-1">{title}</h3>
-      <p className="text-[#577a63] text-sm leading-6">{desc}</p>
-    </div>
+    <h3 className="font-display font-bold text-[#0b3b2a] text-[17px] tracking-tight mb-2">{title}</h3>
+    <p className="text-[#47564c] text-[13.5px] leading-[1.7]">{desc}</p>
   </motion.div>
 );

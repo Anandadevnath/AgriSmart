@@ -27,6 +27,35 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from "./context/AuthContext";
 
+/**
+ * ============================================================
+ * AgriSmart BD — home page design contract ("Modern agri-tech")
+ * ============================================================
+ * THESIS   — A farming intelligence platform: AI disease
+ *            detection + zero-middleman marketplace + live
+ *            weather & price data, for Bangladeshi farmers.
+ * OWN-WORLD — Deep forest ink (#0b3b2a) on clean near-white
+ *            ground (#f6f8f5), one leaf-lime action color
+ *            (#7cc24a), hairline borders instead of shadows,
+ *            editorial Sora/Hind-Siliguri type, 14px radii,
+ *            Lucide line icons. No emoji, no gradients-as-
+ *            decoration, no stock-photo hero, no floating
+ *            badges or pills.
+ * STORY     — Light hero sells the single job (scan → sell),
+ *            then capabilities → numbers → live proof →
+ *            how-it-works → tips → ink CTA closes the loop.
+ * FIRST VIEWPORT — Split hero: headline + two CTAs on the
+ *            left, deep-ink "Today's Snapshot" panel (live
+ *            weather, feature bullets) on the right.
+ * FORM      — Login/Register share the split layout: ink brand
+ *            panel left, clean bordered form right. Fields are
+ *            neutral, focus = lime ring. No HarvestGuard copy;
+ *            the primary brand is AgriSmart BD.
+ * FINISH    — Navbar is always-fixed on these pages only;
+ *            other pages keep absolute-at-top behavior. Footer
+ *            re-skinned to the same ink/lime identity.
+ * ============================================================
+ */
 function App() {
   return (
     <AuthProvider>

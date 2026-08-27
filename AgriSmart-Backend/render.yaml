@@ -1,8 +1,8 @@
 services:
   - type: web
-    name: hackethon-server-side
+    name: agrismart-backend
     env: node
-    rootDir: Hackethon-Server-Side
+    rootDir: AgriSmart-Backend
     envVars:
       - key: NODE_VERSION
         value: "20.18.0"
