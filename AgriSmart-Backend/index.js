@@ -4,6 +4,7 @@ import "dotenv/config";
 import cors from "cors";
 import http from "http";
 import connectDB from "./database/db.js";
+import { requireDB } from "./middleware/requireDB.js";
 import userRoute from "./routes/userRoute.js";
 import listingRoute from "./routes/listingRoute.js";
 import chatRoute from "./routes/chatRoute.js";
@@ -38,11 +39,14 @@ connectDB().catch((err) => {
 });
 
 // -------------------- ROUTES --------------------
-app.use("/user", userRoute);          // auth & profile
-app.use("/listing", listingRoute);    // direct marketplace listings
-app.use("/chat", chatRoute);          // buyer <-> farmer chat (REST + socket)
+// requireDB ensures a live Mongo connection before any DB route runs — on
+// serverless the pooled connection can go stale between warm invocations, which
+// would otherwise make these queries buffer and time out.
+app.use("/user", requireDB, userRoute);          // auth & profile
+app.use("/listing", requireDB, listingRoute);    // direct marketplace listings
+app.use("/chat", requireDB, chatRoute);          // buyer <-> farmer chat (REST + socket)
+app.use("/panel", requireDB, adminRoute);        // admin panel
 app.use("/market-price", marketPriceRoute); // live market price feed
-app.use("/panel", adminRoute);        // admin panel
 app.use("/", pestRoute);              // pest/disease identification helper
 app.use("/data", dataRoute);          // crop types / storage types / divisions reference data
 app.use("/api/smart-alert", smartAlertRoute); // LLM-powered Bangla smart alerts
