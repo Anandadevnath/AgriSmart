@@ -136,7 +136,7 @@ export default function Prices() {
   return (
     <div className="min-h-screen bg-[#f2faf5]">
       {/* Header */}
-      <div className="relative bg-[linear-gradient(135deg,#0b6b3a_0%,#064e2a_70%)] text-white px-5 pt-14 pb-20 overflow-hidden">
+      <div className="relative bg-[linear-gradient(135deg,#0b6b3a_0%,#064e2a_70%)] text-white px-5 pt-28 pb-20 overflow-hidden">
         <div className="absolute -left-10 -top-10 text-[150px] opacity-10 select-none">📈</div>
         <div className="max-w-[1180px] mx-auto">
           <h1 className="text-3xl md:text-4xl font-extrabold drop-shadow-sm inline-flex items-center gap-3">
@@ -178,14 +178,14 @@ export default function Prices() {
               </div>
             </div>
             {weather && (
-              <div className="flex flex-wrap gap-4 md:ml-auto">
+              <div className="flex flex-wrap gap-3 md:ml-auto">
                 {[
                   { icon: <Sun size={16} />, label: isBn ? "সর্বোচ্চ" : "Max", value: `${weather.todayMax}°C` },
                   { icon: <Thermometer size={16} />, label: isBn ? "সর্বনিম্ন" : "Min", value: `${weather.todayMin}°C` },
                   { icon: <CloudRain size={16} />, label: isBn ? "বৃষ্টি" : "Rain", value: `${weather.rainProb}%` },
                   { icon: <Wind size={16} />, label: isBn ? "বাতাস" : "Wind", value: `${weather.windspeed} km/h` },
                 ].map((s, i) => (
-                  <div key={i} className="bg-green-50 rounded-2xl px-4 py-3 text-center min-w-[90px] border border-green-100">
+                  <div key={i} className="w-[calc(50%-6px)] sm:w-auto sm:min-w-[96px] bg-green-50 rounded-2xl px-3 py-3 text-center border border-green-100">
                     <div className="text-green-600 mb-1 inline-flex items-center gap-1">{s.icon} <span className="text-[11px] font-bold">{s.label}</span></div>
                     <div className="font-extrabold text-green-950 text-[15px]">{s.value}</div>
                   </div>
@@ -196,14 +196,14 @@ export default function Prices() {
 
           {/* 7-day mini forecast */}
           {weather?.daily && (
-            <div className="mt-6 pt-5 border-t border-green-100 grid grid-cols-7 gap-2">
+            <div className="mt-6 pt-5 border-t border-green-100 flex gap-2 overflow-x-auto pb-1 sm:grid sm:grid-cols-7 sm:overflow-visible">
               {weather.daily.time.slice(0, 7).map((t, i) => {
                 const days = isBn
                   ? ["রবি", "সোম", "মঙ্গল", "বুধ", "বৃহ", "শুক্র", "শনি"]
                   : ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
                 const d = new Date(t);
                 return (
-                  <div key={t} className="text-center">
+                  <div key={t} className="text-center flex-1 min-w-[68px] sm:min-w-0">
                     <div className="text-[11px] font-bold text-green-600">{days[d.getDay()]}</div>
                     <div className="my-1 text-lg">{weatherIcon(weather.daily.weathercode?.[i] ?? 0)}</div>
                     <div className="text-[12px] font-extrabold text-green-950">{Math.round(weather.daily.temperature_2m_max[i])}°</div>

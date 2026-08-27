@@ -113,7 +113,7 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-[#f2faf5]">
       {/* Header */}
-      <div className="relative bg-[linear-gradient(135deg,#0b6b3a_0%,#064e2a_70%)] text-white px-5 pt-12 pb-16 overflow-hidden">
+      <div className="relative bg-[linear-gradient(135deg,#0b6b3a_0%,#064e2a_70%)] text-white px-5 pt-28 pb-16 overflow-hidden">
         <div className="absolute -right-6 -top-6 text-[140px] opacity-10 select-none">📊</div>
         <div className="max-w-[1180px] mx-auto flex flex-col sm:flex-row sm:items-end justify-between gap-5">
           <div>
@@ -282,13 +282,13 @@ export default function Dashboard() {
                         <span className="w-20 text-[12px] font-bold text-green-800 truncate text-right shrink-0">
                           {isBn ? p.bn : p.cropType}
                         </span>
-                        <div className="flex-1 h-7 rounded-lg bg-green-50 overflow-hidden relative">
+                        <div className="flex-1 h-7 rounded-lg bg-green-50 overflow-hidden">
                           <div className="h-full rounded-lg bg-gradient-to-r from-[#0b6b3a] to-[#49c74f] transition-all duration-700"
                             style={{ width: `${w}%` }} />
-                          <span className="absolute inset-y-0 right-2 flex items-center text-[11px] font-extrabold text-green-950">
-                            ৳{p.pricePerKg}
-                          </span>
                         </div>
+                        <span className="w-12 shrink-0 text-right text-[12px] font-extrabold text-green-950 tabular">
+                          ৳{p.pricePerKg}
+                        </span>
                         <span className={`w-7 shrink-0 inline-flex justify-center ${p.trend === "up" ? "text-green-600" : p.trend === "down" ? "text-red-500" : "text-gray-400"}`}>
                           {p.trend === "up" ? <ArrowUpRight size={16} /> : p.trend === "down" ? <ArrowDownRight size={16} /> : <Minus size={16} />}
                         </span>

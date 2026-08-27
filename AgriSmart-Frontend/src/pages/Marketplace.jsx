@@ -367,7 +367,7 @@ export default function Marketplace() {
   return (
     <div className="min-h-screen bg-[#f2faf5]">
       {/* Header */}
-      <div className="relative bg-[linear-gradient(135deg,#0b6b3a_0%,#064e2a_70%)] text-white px-5 pt-14 pb-16 overflow-hidden">
+      <div className="relative bg-[linear-gradient(135deg,#0b6b3a_0%,#064e2a_70%)] text-white px-5 pt-28 pb-16 overflow-hidden">
         <div className="absolute -right-10 -top-10 text-[160px] opacity-10 select-none">🌾</div>
         <div className="max-w-[1180px] mx-auto flex flex-col sm:flex-row sm:items-end justify-between gap-6">
           <div>

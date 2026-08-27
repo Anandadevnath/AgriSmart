@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import api from '../services/api';
 import toast from 'react-hot-toast';
-import { Sparkles, User, Phone, Image as ImageIcon, MapPin, Globe, KeyRound, Edit3, X, Mail, CheckCircle, Lock, Send, ShieldCheck } from 'lucide-react';
+import { Sparkles, User, Phone, Image as ImageIcon, MapPin, Globe, KeyRound, Edit3, X, Mail, CheckCircle, Lock, Send, ShieldCheck, CalendarDays, BadgeCheck } from 'lucide-react';
 import bdLocations from '../data/bd-locations.json';
 
 const Profile = () => {
@@ -77,7 +77,8 @@ const Profile = () => {
     e.preventDefault();
     setStatus('');
 
-    const updates = { name, avatar };
+    const updates = { name };
+    if (avatar) updates.avatar = avatar;
     if (phone) updates.phone = phone;
     if (preferredLanguage) updates.preferredLanguage = preferredLanguage;
     if (division || district || upazila) {
@@ -229,6 +230,14 @@ const Profile = () => {
     return parts.length > 0 ? parts.join(', ') : (isBn ? 'নির্ধারিত নয়' : 'Not set');
   };
 
+  // Member since date
+  const memberSince = useMemo(() => {
+    if (!user?.createdAt) return null;
+    const d = new Date(user.createdAt);
+    if (Number.isNaN(d.getTime())) return null;
+    return d.toLocaleDateString(isBn ? 'bn-BD' : 'en-GB', { year: 'numeric', month: 'long', day: 'numeric' });
+  }, [user?.createdAt, isBn]);
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -241,25 +250,12 @@ const Profile = () => {
         transition={{ duration: 0.6, ease: 'easeOut' }}
         className="w-full max-w-[900px] bg-white rounded-3xl shadow-2xl p-6 md:p-10 border border-green-200"
       >
-        {/* Header with Edit Button */}
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-3">
-            <Sparkles className="text-green-600" />
-            <h1 className="text-2xl md:text-3xl font-extrabold text-green-700">
-              {isEditing ? (isBn ? 'প্রোফাইল সম্পাদনা' : 'Edit Profile') : (isBn ? 'আমার প্রোফাইল' : 'My Profile')}
-            </h1>
-          </div>
-          {!isEditing && (
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => setIsEditing(true)}
-              className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-xl font-semibold shadow-md hover:bg-green-700 transition-colors"
-            >
-              <Edit3 size={18} />
-              <span className="hidden sm:inline">{isBn ? 'প্রোফাইল সম্পাদনা' : 'Edit Profile'}</span>
-            </motion.button>
-          )}
+        {/* Header */}
+        <div className="flex items-center gap-3 mb-6">
+          <Sparkles className="text-green-600" />
+          <h1 className="text-2xl md:text-3xl font-extrabold text-green-700">
+            {isEditing ? (isBn ? 'প্রোফাইল সম্পাদনা' : 'Edit Profile') : (isBn ? 'আমার প্রোফাইল' : 'My Profile')}
+          </h1>
         </div>
 
         <AnimatePresence mode="wait">
@@ -272,78 +268,111 @@ const Profile = () => {
               exit={{ opacity: 0, x: 20 }}
               transition={{ duration: 0.3 }}
             >
-              {/* Profile Card */}
-              <div className="flex flex-col md:flex-row gap-6 mb-8">
-                {/* Avatar */}
-                <div className="flex-shrink-0 flex justify-center">
+              {/* Cover banner */}
+              <div className="relative h-32 md:h-40 rounded-3xl overflow-hidden bg-gradient-to-br from-[#0b6b3a] via-[#0a8f58] to-[#49c74f]">
+                <div className="absolute -left-4 -top-8 text-[110px] opacity-10 select-none">🌾</div>
+                <div className="absolute -right-4 -bottom-8 text-[90px] opacity-10 select-none">🌱</div>
+              </div>
+
+              {/* Identity — avatar overlaps the banner */}
+              <div className="flex flex-col items-center -mt-16 mb-8">
+                <div className="relative">
                   {avatar ? (
-                    <img src={avatar} alt={name} className="w-32 h-32 rounded-full object-cover border-4 border-green-200 shadow-lg" />
+                    <img src={avatar} alt={name} className="w-28 h-28 md:w-32 md:h-32 rounded-full object-cover ring-4 ring-white shadow-xl" />
                   ) : (
-                    <div className="w-32 h-32 rounded-full bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center text-white text-5xl font-bold shadow-lg">
+                    <div className="w-28 h-28 md:w-32 md:h-32 rounded-full bg-gradient-to-br from-[#0a8f58] to-[#49c74f] ring-4 ring-white shadow-xl flex items-center justify-center text-white text-4xl md:text-5xl font-bold">
                       {name ? name[0].toUpperCase() : 'U'}
                     </div>
                   )}
-                </div>
-
-                {/* User Info */}
-                <div className="flex-1 space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {/* Name */}
-                    <div className="bg-green-50 rounded-xl p-4 border border-green-100">
-                      <div className="flex items-center gap-2 text-green-600 text-sm font-medium mb-1">
-                        <User size={16} />
-                        {isBn ? 'নাম' : 'Name'}
-                      </div>
-                      <div className="text-green-800 font-semibold text-lg">{name || (isBn ? 'নির্ধারিত নয়' : 'Not set')}</div>
-                    </div>
-
-                    {/* Email */}
-                    <div className="bg-green-50 rounded-xl p-4 border border-green-100">
-                      <div className="flex items-center gap-2 text-green-600 text-sm font-medium mb-1">
-                        <Mail size={16} />
-                        {isBn ? 'ইমেইল' : 'Email'}
-                      </div>
-                      <div className="text-green-800 font-semibold text-lg break-all">{user?.email || (isBn ? 'নির্ধারিত নয়' : 'Not set')}</div>
-                    </div>
-
-                    {/* Phone */}
-                    <div className="bg-green-50 rounded-xl p-4 border border-green-100">
-                      <div className="flex items-center gap-2 text-green-600 text-sm font-medium mb-1">
-                        <Phone size={16} />
-                        {isBn ? 'ফোন' : 'Phone'}
-                      </div>
-                      <div className="text-green-800 font-semibold text-lg">{phone || (isBn ? 'নির্ধারিত নয়' : 'Not set')}</div>
-                    </div>
-
-                    {/* Language */}
-                    <div className="bg-green-50 rounded-xl p-4 border border-green-100">
-                      <div className="flex items-center gap-2 text-green-600 text-sm font-medium mb-1">
-                        <Globe size={16} />
-                        {isBn ? 'পছন্দের ভাষা' : 'Preferred Language'}
-                      </div>
-                      <div className="text-green-800 font-semibold text-lg">{preferredLanguage === 'bn' ? 'বাংলা' : 'English'}</div>
-                    </div>
-
-                    {/* Location - Full Width */}
-                    <div className="bg-green-50 rounded-xl p-4 border border-green-100 md:col-span-2">
-                      <div className="flex items-center gap-2 text-green-600 text-sm font-medium mb-1">
-                        <MapPin size={16} />
-                        {isBn ? 'অবস্থান' : 'Location'}
-                      </div>
-                      <div className="text-green-800 font-semibold text-lg">{getLocationDisplay()}</div>
-                    </div>
-                  </div>
-
-                  {/* Verification Status */}
-                  <div className={`flex items-center gap-2 p-3 rounded-xl ${user?.isVerified ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>
-                    <CheckCircle size={20} />
-                    <span className="font-medium">
-                      {user?.isVerified 
-                        ? (isBn ? 'যাচাইকৃত অ্যাকাউন্ট' : 'Verified Account') 
-                        : (isBn ? 'অযাচাইকৃত অ্যাকাউন্ট' : 'Unverified Account')}
+                  {user?.isVerified ? (
+                    <span className="absolute -bottom-1 -right-1 w-9 h-9 rounded-full bg-white shadow-md flex items-center justify-center">
+                      <BadgeCheck className="text-green-600" size={24} />
                     </span>
+                  ) : (
+                    <span className="absolute -bottom-1 -right-1 w-8 h-8 rounded-full bg-amber-100 shadow-md flex items-center justify-center">
+                      <Mail className="text-amber-600" size={18} />
+                    </span>
+                  )}
+                </div>
+                <h2 className="mt-3 text-2xl font-extrabold text-green-950 flex items-center gap-2">
+                  {name || (isBn ? 'নাম নেই' : 'No name')}
+                </h2>
+                <p className="text-green-700/60 text-sm mt-0.5">{user?.email}</p>
+              </div>
+
+              {/* Info grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-3xl mx-auto">
+                {/* Phone */}
+                <div className="flex items-center gap-4 bg-green-50 rounded-2xl p-4 border border-green-100">
+                  <span className="w-11 h-11 rounded-xl bg-green-600/10 text-green-700 flex items-center justify-center shrink-0">
+                    <Phone size={20} />
+                  </span>
+                  <div className="min-w-0">
+                    <div className="text-[11px] font-bold uppercase tracking-wider text-green-500">{isBn ? 'ফোন' : 'Phone'}</div>
+                    <div className="font-semibold text-green-950 truncate">{phone || (isBn ? 'নির্ধারিত নয়' : 'Not set')}</div>
                   </div>
                 </div>
+
+                {/* Preferred Language */}
+                <div className="flex items-center gap-4 bg-green-50 rounded-2xl p-4 border border-green-100">
+                  <span className="w-11 h-11 rounded-xl bg-green-600/10 text-green-700 flex items-center justify-center shrink-0">
+                    <Globe size={20} />
+                  </span>
+                  <div className="min-w-0">
+                    <div className="text-[11px] font-bold uppercase tracking-wider text-green-500">{isBn ? 'পছন্দের ভাষা' : 'Preferred Language'}</div>
+                    <div className="font-semibold text-green-950 truncate">{preferredLanguage === 'bn' ? 'বাংলা' : 'English'}</div>
+                  </div>
+                </div>
+
+                {/* Location - full width */}
+                <div className="flex items-center gap-4 bg-green-50 rounded-2xl p-4 border border-green-100 md:col-span-2">
+                  <span className="w-11 h-11 rounded-xl bg-green-600/10 text-green-700 flex items-center justify-center shrink-0">
+                    <MapPin size={20} />
+                  </span>
+                  <div className="min-w-0">
+                    <div className="text-[11px] font-bold uppercase tracking-wider text-green-500">{isBn ? 'অবস্থান' : 'Location'}</div>
+                    <div className="font-semibold text-green-950">{getLocationDisplay()}</div>
+                  </div>
+                </div>
+
+                {/* Member since - full width (when available) */}
+                {memberSince && (
+                  <div className="flex items-center gap-4 bg-green-50 rounded-2xl p-4 border border-green-100 md:col-span-2">
+                    <span className="w-11 h-11 rounded-xl bg-green-600/10 text-green-700 flex items-center justify-center shrink-0">
+                      <CalendarDays size={20} />
+                    </span>
+                    <div className="min-w-0">
+                      <div className="text-[11px] font-bold uppercase tracking-wider text-green-500">{isBn ? 'সদস্য হয়েছেন' : 'Member Since'}</div>
+                      <div className="font-semibold text-green-950">{memberSince}</div>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Actions */}
+              <div className="flex flex-col sm:flex-row gap-3 mt-8 max-w-3xl mx-auto">
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => { setIsEditing(true); setShowPasswordSection(false); }}
+                  className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-[#0b6b3a] text-white rounded-xl font-bold shadow-md hover:bg-[#085b30] transition-colors"
+                >
+                  <Edit3 size={18} />
+                  {isBn ? 'প্রোফাইল সম্পাদনা' : 'Edit Profile'}
+                </motion.button>
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => setShowPasswordSection(v => !v)}
+                  className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl font-bold border transition-colors ${
+                    showPasswordSection
+                      ? 'bg-amber-100 border-amber-300 text-amber-800'
+                      : 'bg-amber-50 border-amber-200 text-amber-700 hover:bg-amber-100'
+                  }`}
+                >
+                  <KeyRound size={18} />
+                  {isBn ? 'পাসওয়ার্ড পরিবর্তন' : 'Change Password'}
+                </motion.button>
               </div>
             </motion.div>
           ) : (
@@ -461,24 +490,14 @@ const Profile = () => {
           )}
         </AnimatePresence>
 
-        {/* Change Password Section - Always visible */}
+        {/* Change Password Section - shown when toggled */}
+        {showPasswordSection && (
         <div className="mt-8 border-t border-green-200 pt-6">
-          {!showPasswordSection ? (
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={() => setShowPasswordSection(true)}
-              className="w-full flex items-center justify-center gap-3 p-4 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-xl text-amber-700 font-semibold hover:from-amber-100 hover:to-orange-100 transition-colors"
-            >
-              <KeyRound size={20} />
-              {isBn ? 'পাসওয়ার্ড পরিবর্তন করুন' : 'Change Password'}
-            </motion.button>
-          ) : (
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="p-6 rounded-2xl bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-200"
-            >
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="p-6 rounded-2xl bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-200"
+          >
               {/* Header */}
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-xl font-bold text-amber-800 flex items-center gap-2">
@@ -623,8 +642,8 @@ const Profile = () => {
                 </motion.div>
               )}
             </motion.div>
-          )}
-        </div>
+          </div>
+        )}
       </motion.div>
     </motion.div>
   );
