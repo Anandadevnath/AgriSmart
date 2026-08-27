@@ -5,15 +5,15 @@ import { useAuth } from '../context/AuthContext';
 import { Globe, Menu, X, Store, MessageCircle, TrendingUp, Scan, Wheat } from 'lucide-react';
 import { useScroll, useOutsideClick } from "../hooks/useNavbarHooks";
 
-function Logo({ className = "h-9 md:h-10" }) {
+function Logo({ className = "h-9 md:h-10", light = false }) {
   return (
     <span className={`inline-flex items-center gap-2.5 font-display font-extrabold tracking-tight ${className}`}>
       <span className="w-8 h-8 rounded-[10px] bg-[#0b3b2a] flex items-center justify-center text-[#7cc24a]">
         <Wheat className="w-4.5 h-4.5" strokeWidth={2.2} />
       </span>
-      <span className="text-lg md:text-xl text-[#0b3b2a]">
+      <span className={`text-lg md:text-xl ${light ? 'text-white' : 'text-[#0b3b2a]'}`}>
         AgriSmart
-        <span className="text-[#6f7d73] ml-1 text-xs md:text-sm font-bold align-super">BD</span>
+        <span className={`ml-1 text-xs md:text-sm font-bold align-super ${light ? 'text-white/60' : 'text-[#6f7d73]'}`}>BD</span>
       </span>
     </span>
   );
@@ -64,7 +64,7 @@ const Navbar = () => {
     <nav className={navClasses}>
       <div className="max-w-[1400px] mx-auto px-4 md:px-6 py-0 flex items-center justify-between min-h-[72px]">
         <Link to="/" className="inline-block no-underline">
-          <Logo />
+          <Logo light={!isDesignPage && !scrolled} />
         </Link>
 
         {/* Desktop nav */}
@@ -108,7 +108,9 @@ const Navbar = () => {
                 {user.avatar ? (
                   <img src={user.avatar} alt={user.name} className="w-9 h-9 rounded-full object-cover border-2 border-[#7cc24a]/40" />
                 ) : (
-                  <div className="w-9 h-9 rounded-full flex items-center justify-center bg-[#0b3b2a]/10 font-bold text-sm text-[#0b3b2a]">
+                  <div className={`w-9 h-9 rounded-full flex items-center justify-center font-bold text-sm ${
+                    isDesignPage || scrolled ? 'bg-[#0b3b2a]/10 text-[#0b3b2a]' : 'bg-white/20 text-white'
+                  }`}>
                     {(user.name && user.name[0]) || 'U'}
                   </div>
                 )}

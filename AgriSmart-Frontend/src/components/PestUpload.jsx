@@ -46,10 +46,12 @@ export default function PestUpload({ division = null, district = null }) {
   return (
     <div className="bg-white rounded-[16px] border border-[#e4eae3] p-6 md:p-8">
       <div className="text-center max-w-[520px] mx-auto">
-        <Button onClick={() => fileInputRef.current?.click()} className="gap-2.5">
-          <ImagePlus className="w-5 h-5" strokeWidth={2.2} />
-          {t.upload}
-        </Button>
+        <div className="flex justify-center">
+          <Button onClick={() => fileInputRef.current?.click()} className="gap-2.5">
+            <ImagePlus className="w-5 h-5" strokeWidth={2.2} />
+            {t.upload}
+          </Button>
+        </div>
         <input
           type="file"
           accept="image/*"
