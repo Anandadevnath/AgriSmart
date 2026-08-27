@@ -41,7 +41,9 @@ app.use("/", pestRoute);              // pest/disease identification helper
 // -------------------- CROP DISEASE SCANNER (AI) --------------------
 
 const HF_API_TOKEN = process.env.HF_API_TOKEN;
-const HF_MODEL_ID = "wambugu71/crop_leaf_diseases_vit";
+// Note: previous model "wambugu71/crop_leaf_diseases_vit" was deprecated and no
+// longer served by hf-inference. This one (PlantVillage-based) is actively served.
+const HF_MODEL_ID = "linkanjarad/mobilenet_v2_1.0_224-plant-disease-identification";
 
 if (!HF_API_TOKEN) {
   console.warn("Warning: HF_API_TOKEN is not set in .env");
@@ -63,13 +65,20 @@ app.post("/api/predict", async (req, res) => {
     const base64Data = imageBase64.split(",")[1] || imageBase64;
     const imgBuffer = Buffer.from(base64Data, "base64");
 
+    // Sniff the MIME type from a data-URL prefix (data:image/png;base64,...),
+    // fall back to image/jpeg for raw base64 input.
+    const dataUrlPrefix = imageBase64.split(",")[0];
+    const mimeType = /^data:([a-zA-Z0-9.+\-]+\/[a-zA-Z0-9.+\-]+);/.test(dataUrlPrefix)
+      ? dataUrlPrefix.match(/^data:([a-zA-Z0-9.+\-]+\/[a-zA-Z0-9.+\-]+);/)[1]
+      : "image/jpeg";
+
     const hfRes = await fetch(
       `https://router.huggingface.co/hf-inference/models/${HF_MODEL_ID}`,
       {
         method: "POST",
         headers: {
           Authorization: `Bearer ${HF_API_TOKEN}`,
-          "Content-Type": "image/jpeg",
+          "Content-Type": mimeType,
         },
         body: imgBuffer,
       }

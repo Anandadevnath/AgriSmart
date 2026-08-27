@@ -33,7 +33,7 @@ const Navbar = () => {
 
   // Redesigned pages use always-fixed light navbar;
   // other pages keep original absolute-at-top / fixed-on-scroll behavior
-  const isDesignPage = ['/', '/login', '/register'].includes(location.pathname);
+  const isDesignPage = ['/', '/login', '/register', '/scan-crop'].includes(location.pathname);
 
   const navClasses = isDesignPage
     ? 'fixed top-0 left-0 right-0 z-[9999] bg-[#f6f8f5]/90 backdrop-blur-md transition-shadow duration-300 border-b border-[#0b3b2a]/8'
