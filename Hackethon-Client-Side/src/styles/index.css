@@ -1,0 +1,27 @@
+@import "tailwindcss";
+
+/* ============================================================
+   AgriSmart BD — global tokens & base styles
+   ============================================================ */
+:root {
+  --color-brand-primary: #0b6b3a;        /* deep harvest green */
+  --color-brand-secondary: #ffffff;      /* on-primary text */
+  --color-brand-button-primary: #0b6b3a;
+  --color-brand-button-outline: #0b6b3a;
+  --color-brand-highlight: #49c74f;      /* bright green accent */
+  --color-brand-neutral-100: #f4faf6;
+  --color-brand-neutral-200: #dcebe2;
+  --color-brand-neutral-400: #9db4a6;
+  --color-brand-neutral-500: #6f8b7b;
+  --color-brand-neutral-600: #4a6154;
+}
+
+/* Prevent accidental horizontal overflow across the site */
+html, body, #root {
+	overflow-x: hidden;
+}
+
+/* Smooth scrolling for in-page anchors */
+html {
+  scroll-behavior: smooth;
+}

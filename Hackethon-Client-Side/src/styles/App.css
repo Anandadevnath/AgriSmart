@@ -1,0 +1,10 @@
+@import "tailwindcss";
+
+/* App.css - base styles for the app */
+body {
+  @apply m-0 font-sans bg-[#f7f7f7];
+}
+
+#root {
+  @apply min-h-screen;
+}
