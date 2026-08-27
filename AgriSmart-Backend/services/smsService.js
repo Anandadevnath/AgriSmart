@@ -53,10 +53,11 @@ export async function sendSms({ to, message }) {
   return sendViaGenericToken({ number, message });
 }
 
-/** Aion Messaging — X-API-Key header + JSON body (E.164 with +). */
+/** Aion Messaging — X-API-Key header + JSON body (E.164 with +).
+ *  Aion has its own endpoint; do NOT reuse SMS_API_URL (that is a
+ *  GreenWeb-style value and would send Aion's token to the wrong gateway). */
 async function sendViaAion({ number, message }) {
-  const url =
-    process.env.SMS_API_URL || "https://aionmessaging.com/api/v1/sms/send";
+  const url = "https://aionmessaging.com/api/v1/sms/send";
   const sender = process.env.SMS_SENDER_ID || "AgriSmart";
 
   const controller = new AbortController();
