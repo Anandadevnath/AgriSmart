@@ -1,5 +1,6 @@
 // controllers/smartAlertController.js
 import { InferenceClient } from "@huggingface/inference";
+import { sendSms } from "../services/smsService.js";
 
 const client = new InferenceClient(process.env.HF_API_TOKEN);
 
@@ -54,6 +55,7 @@ export async function generateSmartAlert(req, res) {
       humidity,
       rainProb,
       moisture,
+      to, // optional emergency phone number (E.164 or 01XXXXXXXXX)
     } = req.body;
 
     if (!cropType || !riskLevel) {
@@ -119,6 +121,19 @@ export async function generateSmartAlert(req, res) {
 
     const shouldSimulateSMS = riskLevel === "Critical";
 
+    // Best-effort emergency SMS when risk is Critical and a phone is supplied.
+    // Never blocks the response — sendSms resolves fast (3s timeout) and
+    // failures are swallowed so the alert always reaches the UI.
+    let smsStatus = { attempted: false };
+    if (riskLevel === "Critical" && to) {
+      try {
+        smsStatus = await sendSms({ to, message: alertMessage });
+      } catch (smsErr) {
+        console.error("SMS send failed (best-effort):", smsErr);
+        smsStatus = { attempted: true, error: smsErr.message };
+      }
+    }
+
     return res.json({
       ok: true,
       data: {
@@ -129,6 +144,7 @@ export async function generateSmartAlert(req, res) {
         cropBn,
         etcl,
         shouldSimulateSMS,
+        sms: smsStatus,
         timestamp: new Date().toISOString(),
       },
     });
@@ -149,6 +165,30 @@ export async function generateSmartAlert(req, res) {
         fallback: true,
       },
     });
+  }
+}
+
+/**
+ * Send a single SMS through the configured gateway (or demo fallback).
+ * POST /api/smart-alert/sms
+ * Body: { to: string (required), message: string (required) }
+ * Returns { ok, sent, simulated, to, error? }.
+ */
+export async function sendSmsAlert(req, res) {
+  try {
+    const { to, message } = req.body || {};
+    if (!to || !message || !String(message).trim()) {
+      return res.status(400).json({
+        ok: false,
+        error: "to and message are required",
+      });
+    }
+
+    const result = await sendSms({ to, message });
+    return res.json({ ok: true, ...result });
+  } catch (error) {
+    console.error("SMS Alert Error:", error);
+    return res.status(500).json({ ok: false, error: "Failed to send SMS" });
   }
 }
 

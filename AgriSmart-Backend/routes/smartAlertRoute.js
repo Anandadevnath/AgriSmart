@@ -1,6 +1,10 @@
 // routes/smartAlertRoute.js
 import express from 'express';
-import { generateSmartAlert, generateBatchAlerts } from '../controllers/smartAlertController.js';
+import {
+  generateSmartAlert,
+  generateBatchAlerts,
+  sendSmsAlert,
+} from '../controllers/smartAlertController.js';
 
 const router = express.Router();
 
@@ -32,6 +36,17 @@ router.post('/', generateSmartAlert);
  * }
  */
 router.post('/batch', generateBatchAlerts);
+
+/**
+ * POST /api/smart-alert/sms
+ * Send an emergency SMS via the configured gateway (or demo fallback).
+ *
+ * Body: {
+ *   to: string (required) - phone number (01XXXXXXXXX or +8801XXXXXXXXX),
+ *   message: string (required)
+ * }
+ */
+router.post('/sms', sendSmsAlert);
 
 export default router;
 
