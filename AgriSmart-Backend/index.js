@@ -31,9 +31,6 @@ app.use(cors({
 }));
 
 // -------------------- DATABASE --------------------
-// Fire-and-forget connection. The .catch() prevents an unhandled promise
-// rejection from crashing the process (serverless cold starts especially);
-// requests that need Mongo will fail with a clear error if it never connects.
 connectDB().catch((err) => {
   console.error("MongoDB connection failed at startup:", err.message);
 });
