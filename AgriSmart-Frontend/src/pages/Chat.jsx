@@ -11,6 +11,16 @@ import { useAuth } from "../context/AuthContext";
 import api from "../services/api";
 import { cropLabel } from "../data/bangladesh";
 
+// Vercel serverless functions can't host Socket.IO (no WebSocket upgrade / no
+// long-lived process) — the deployed backend 404s on /socket.io/. When the
+// frontend itself runs on Vercel we skip the socket entirely and rely on the
+// REST + polling fallback below, so we don't spam the console/network with
+// 404 retries. Localhost and self-hosted deployments keep real-time chat.
+const ON_SERVERLESS = typeof window !== "undefined" && !!(
+  window.location.hostname.endsWith(".vercel.app") ||
+  window.location.hostname.endsWith(".vercel.dev")
+);
+
 const fmtTime = (iso) => {
   if (!iso) return "";
   try {
@@ -144,7 +154,20 @@ export default function Chat() {
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
     if (!token || !meId) return;
-    const sock = io(api.API_BASE, { auth: { token } });
+
+    // Vercel serverless has no /socket.io endpoint — skip the socket entirely
+    // and go straight to the REST + polling fallback (setSocketStatus("offline")
+    // makes the poll effect below engage).
+    if (ON_SERVERLESS) {
+      setSocketStatus("offline");
+      return;
+    }
+
+    const sock = io(api.API_BASE, {
+      auth: { token },
+      reconnectionDelay: 1000,
+      reconnectionDelayMax: 5000,
+    });
     socketRef.current = sock;
 
     sock.on("connect", () => {
@@ -152,7 +175,13 @@ export default function Chat() {
       sock.emit("conversation:join", activeRef.current);
     });
     sock.on("disconnect", () => setSocketStatus("offline"));
-    sock.on("connect_error", () => setSocketStatus("offline"));
+    sock.on("connect_error", (err) => {
+      setSocketStatus("offline");
+      // Backend has no /socket.io (e.g. a custom-domain frontend pointing at a
+      // serverless backend). Stop retrying so we don't spam 404 requests — the
+      // REST polling fallback stays engaged.
+      if (err?.description === 404) sock.disconnect();
+    });
 
     sock.on("message:new", (msg) => {
       if (msg.conversationId === activeRef.current) {
@@ -258,14 +287,17 @@ export default function Chat() {
 
   // --- near-real-time fallback when the socket is not available (Vercel
   // serverless has no WebSocket, so socketStatus stays "offline"). Poll the open
-  // conversation so the other participant's messages still appear — no manual
-  // refresh needed. Merges by id so optimistic ("tmp-") messages aren't lost. ---
+  // conversation every 2s so the other participant's messages still appear — no
+  // manual refresh needed. Also refresh the conversation list every 15s so the
+  // sort order and previews stay current without the socket's
+  // "conversation:updated" event. Merges server messages by id so optimistic
+  // ("tmp-") messages aren't lost. ---
   useEffect(() => {
     if (!active || socketStatus === "online") return;
     const token = localStorage.getItem("accessToken");
     let cancelled = false;
 
-    const poll = async () => {
+    const pollMessages = async () => {
       try {
         const { ok, data } = await api.get(`/chat/conversations/${active}/messages`, {
           headers: { Authorization: `Bearer ${token}` },
@@ -283,10 +315,26 @@ export default function Chat() {
       }
     };
 
-    poll();
-    const timer = setInterval(poll, 4000);
-    return () => { cancelled = true; clearInterval(timer); };
-  }, [active, socketStatus]);
+    const pollConversations = async () => {
+      try {
+        const { ok, data } = await api.get("/chat/conversations", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (!cancelled && ok) setConversations(data?.data || []);
+      } catch (e) {
+        /* ignore */
+      }
+    };
+
+    pollMessages();
+    const msgTimer = setInterval(pollMessages, 2000);
+    const convoTimer = setInterval(pollConversations, 15000);
+    return () => {
+      cancelled = true;
+      clearInterval(msgTimer);
+      clearInterval(convoTimer);
+    };
+  }, [active, socketStatus, loadConversations]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });

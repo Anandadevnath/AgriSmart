@@ -11,6 +11,10 @@ if (typeof window !== 'undefined' && window.localStorage && window.localStorage.
   // Deployed on Vercel but VITE_API_BASE not set in build env → use the known backend.
   // Override with localStorage or Vercel env var to point elsewhere.
   API_BASE = 'https://agrismart-backend-lac.vercel.app';
+} else if (typeof window !== 'undefined' && window.location.protocol === 'https:' && !['localhost', '127.0.0.1'].includes(window.location.hostname)) {
+  // Custom domain in production without VITE_API_BASE → fall back to the known
+  // backend so API calls don't go to the SPA origin (which would 404 / return HTML).
+  API_BASE = 'https://agrismart-backend-lac.vercel.app';
 } else {
   API_BASE = '';
 }
