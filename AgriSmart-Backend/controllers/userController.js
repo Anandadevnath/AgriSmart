@@ -343,3 +343,19 @@ export const getMe = async (req, res) => {
     return res.status(500).json({ success: false, message: error.message });
   }
 };
+
+// GET /user/list — directory of platform members so users can start a chat with
+// anyone, not just people they already have a conversation with. Excludes the
+// requester; online (isLoggedIn) members sort first.
+export const listUsers = async (req, res) => {
+  try {
+    const me = req.userId;
+    const users = await Farmer.find({ _id: { $ne: me } })
+      .select('name phone avatar role preferredLanguage location isLoggedIn updatedAt')
+      .sort({ isLoggedIn: -1, updatedAt: -1 })
+      .limit(200);
+    return res.status(200).json({ success: true, data: users });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};

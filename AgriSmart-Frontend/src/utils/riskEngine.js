@@ -1,5 +1,4 @@
 // src/utils/riskEngine.js
-import { simulateSMSNotification } from '../services/smartAlertService';
 
 // Bangla translations for crops and storage
 const CROP_BN = {
@@ -124,18 +123,6 @@ export function generateRiskSummaryFromRow(row) {
     rainProb: parseFloat(result.avgRain),
     temperature: parseFloat(result.avgTemp)
   });
-
-  // Simulate SMS notification for Critical risk
-  if (riskLevel === "Critical") {
-    simulateSMSNotification({
-      alertMessage: banglaAlert,
-      cropType,
-      cropBn,
-      riskLevel,
-      riskBn,
-      etcl: result.etcl
-    });
-  }
 
   return {
     batchId: row["Batch_ID"],

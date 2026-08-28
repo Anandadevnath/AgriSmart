@@ -67,6 +67,36 @@ function ConversationRow({ convo, active, onClick, isBn }) {
   );
 }
 
+function MemberRow({ member, onClick, isBn }) {
+  return (
+    <button
+      onClick={onClick}
+      className="w-full text-left px-4 py-3 flex items-center gap-3 transition-colors hover:bg-green-50/70"
+    >
+      <span className="relative w-11 h-11 rounded-full bg-[#0b6b3a]/10 flex items-center justify-center text-[#0b6b3a] shrink-0">
+        {member.avatar ? <img src={member.avatar} alt="" className="w-11 h-11 rounded-full object-cover" /> : <User size={20} />}
+        {member.isLoggedIn && (
+          <span className="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-[#49c74f] border-2 border-white" />
+        )}
+      </span>
+      <span className="flex-1 min-w-0">
+        <span className="flex items-center justify-between gap-2">
+          <span className="font-bold text-green-950 text-[14px] truncate">{member.name || (isBn ? "সদস্য" : "Member")}</span>
+          {member.isLoggedIn && (
+            <span className="text-[10.5px] font-bold text-[#0b8f58] shrink-0">{isBn ? "অনলাইন" : "Online"}</span>
+          )}
+        </span>
+        <span className="flex items-center gap-2 text-[12.5px] text-green-700/70 truncate">
+          <span className="shrink-0 inline-flex items-center gap-1">
+            <MapPin size={12} /> {member.location?.division || "—"}
+          </span>
+          <span className="truncate">· {member.role === "admin" ? "Admin" : isBn ? "কৃষক" : "Farmer"}</span>
+        </span>
+      </span>
+    </button>
+  );
+}
+
 export default function Chat() {
   const { lang } = useLanguage();
   const isBn = lang === "bn";
@@ -84,6 +114,8 @@ export default function Chat() {
   const [loadingMsgs, setLoadingMsgs] = useState(false);
   const [typing, setTyping] = useState(false);
   const [search, setSearch] = useState("");
+  const [users, setUsers] = useState([]); // platform members directory
+  const [tab, setTab] = useState("chats"); // chats | people
   const [socketStatus, setSocketStatus] = useState("connecting"); // connecting | online | offline
   const socketRef = useRef(null);
   const typingTimeout = useRef(null);
@@ -157,9 +189,25 @@ export default function Chat() {
 
   useEffect(() => { loadConversations(); }, [loadConversations]);
 
+  // --- load platform members directory (people you can start a chat with) ---
+  useEffect(() => {
+    if (!meId) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const token = localStorage.getItem("accessToken");
+        const { ok, data } = await api.get("/user/list", { headers: { Authorization: `Bearer ${token}` } });
+        if (!cancelled && ok) setUsers(data?.data || []);
+      } catch (e) {
+        /* offline */
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [meId]);
+
   // --- start a conversation from marketplace deep-link ---
   const ensureConversation = useCallback(async (recipientId, listingId) => {
-    if (!meId || !recipientId) return;
+    if (!meId || !recipientId) return false;
     try {
       const token = localStorage.getItem("accessToken");
       const { ok, data } = await api.post(
@@ -172,10 +220,13 @@ export default function Chat() {
         // move to front of list
         setConversations((prev) => [data.data, ...prev.filter((c) => c._id !== data.data._id)]);
         setSearchParams({}, { replace: true });
+        return true;
       }
+      return false;
     } catch (e) {
       toast.error(isBn ? "কথোপকথন শুরু করা যায়নি" : "Could not start conversation");
       setSearchParams({}, { replace: true });
+      return false;
     }
   }, [meId, isBn, setSearchParams]);
 
@@ -320,6 +371,20 @@ export default function Chat() {
     );
   }, [conversations, search]);
 
+  const filteredUsers = useMemo(() => {
+    if (!search.trim()) return users;
+    const q = search.toLowerCase();
+    return users.filter(
+      (u) => (u.name || "").toLowerCase().includes(q) || (u.phone || "").includes(q) || (u.location?.division || "").toLowerCase().includes(q)
+    );
+  }, [users, search]);
+
+  // Start (or open) a conversation with a platform member and jump to the Chats tab.
+  const startChatWith = async (member) => {
+    const ok = await ensureConversation(member._id);
+    if (ok) setTab("chats");
+  };
+
   if (!meId) {
     return (
       <div className="min-h-screen bg-[#f2faf5] flex items-center justify-center px-5">
@@ -355,45 +420,84 @@ export default function Chat() {
         </div>
 
         <div className="grid md:grid-cols-[320px_1fr] gap-5">
-          {/* Conversation list */}
+          {/* Conversation list — full pane on mobile, hidden when a thread is open */}
           <motion.div initial={{ opacity: 0, x: -16 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.4 }}
-            className="bg-white rounded-3xl border border-green-100 shadow-[0_6px_24px_rgba(0,60,30,0.07)] overflow-hidden flex flex-col h-[calc(100vh-240px)] min-h-[420px]">
-            <div className="p-4 border-b border-green-100">
+            className={`${active ? "hidden md:flex" : "flex"} flex-col bg-white rounded-3xl border border-green-100 shadow-[0_6px_24px_rgba(0,60,30,0.07)] overflow-hidden h-[70vh] min-h-[400px] md:h-[calc(100vh-240px)] md:min-h-[420px]`}>
+            <div className="p-4 border-b border-green-100 flex flex-col gap-2">
+              {/* Tab toggle */}
+              <div className="flex bg-green-50 rounded-xl p-1">
+                <button
+                  onClick={() => { setTab("chats"); setSearch(""); }}
+                  className={`flex-1 text-[13px] font-bold py-2 rounded-lg transition-colors ${tab === "chats" ? "bg-white text-[#0b6b3a] shadow-sm" : "text-green-600 hover:text-green-800"}`}
+                >
+                  {isBn ? "চ্যাটসমূহ" : "Chats"}
+                </button>
+                <button
+                  onClick={() => { setTab("people"); setSearch(""); }}
+                  className={`flex-1 text-[13px] font-bold py-2 rounded-lg transition-colors ${tab === "people" ? "bg-white text-[#0b6b3a] shadow-sm" : "text-green-600 hover:text-green-800"}`}
+                >
+                  {isBn ? "ব্যবহারকারী" : "People"} <span className="text-[11px] text-green-400 font-semibold">({users.length})</span>
+                </button>
+              </div>
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-green-400" size={16} />
                 <input
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  placeholder={isBn ? "চ্যাট খুঁজুন…" : "Search chats…"}
+                  placeholder={tab === "chats" ? (isBn ? "চ্যাট খুঁজুন…" : "Search chats…") : (isBn ? "সদস্য খুঁজুন…" : "Search members…")}
                   className="w-full rounded-xl border border-green-200 bg-green-50/50 pl-9 pr-3 py-2.5 text-sm text-green-950 placeholder:text-green-400 focus:outline-none focus:ring-2 focus:ring-[#49c74f]/40 transition"
                 />
               </div>
             </div>
             <div className="flex-1 overflow-y-auto divide-y divide-green-50">
-              {loadingList ? (
-                <div className="p-6 space-y-4">
-                  {[1, 2, 3].map((i) => <div key={i} className="h-12 rounded-xl bg-green-50 animate-pulse" />)}
-                </div>
-              ) : filtered.length === 0 ? (
-                <div className="p-8 text-center">
-                  <div className="w-14 h-14 mx-auto rounded-2xl bg-green-50 flex items-center justify-center mb-3">
-                    <MessageCircle className="text-green-300" size={26} />
+              {tab === "chats" ? (
+                loadingList ? (
+                  <div className="p-6 space-y-4">
+                    {[1, 2, 3].map((i) => <div key={i} className="h-12 rounded-xl bg-green-50 animate-pulse" />)}
                   </div>
-                  <p className="text-green-700/60 text-sm">
-                    {isBn ? "এখনও কোনো চ্যাট নেই। বাজারে গিয়ে ক্রেতার সঙ্গে কথা বলুন।" : "No conversations yet. Head to the marketplace and reach out to a buyer."}
-                  </p>
-                </div>
+                ) : filtered.length === 0 ? (
+                  <div className="p-8 text-center">
+                    <div className="w-14 h-14 mx-auto rounded-2xl bg-green-50 flex items-center justify-center mb-3">
+                      <MessageCircle className="text-green-300" size={26} />
+                    </div>
+                    <p className="text-green-700/60 text-sm">
+                      {isBn ? "এখনও কোনো চ্যাট নেই। বাজারে গিয়ে ক্রেতার সঙ্গে কথা বলুন।" : "No conversations yet. Head to the marketplace and reach out to a buyer."}
+                    </p>
+                    {users.length > 0 && (
+                      <button onClick={() => setTab("people")} className="mt-3 inline-flex items-center gap-1.5 text-[13px] font-bold text-[#0b6b3a] hover:underline">
+                        {isBn ? "সদস্যদের দেখুন" : "See all members"} →
+                      </button>
+                    )}
+                  </div>
+                ) : (
+                  filtered.map((c) => (
+                    <ConversationRow key={c._id} convo={c} active={active === c._id} onClick={() => setActive(c._id)} isBn={isBn} />
+                  ))
+                )
               ) : (
-                filtered.map((c) => (
-                  <ConversationRow key={c._id} convo={c} active={active === c._id} onClick={() => setActive(c._id)} isBn={isBn} />
-                ))
+                filteredUsers.length === 0 ? (
+                  <div className="p-8 text-center">
+                    <div className="w-14 h-14 mx-auto rounded-2xl bg-green-50 flex items-center justify-center mb-3">
+                      <User className="text-green-300" size={26} />
+                    </div>
+                    <p className="text-green-700/60 text-sm">
+                      {search.trim()
+                        ? (isBn ? "কোনো সদস্য পাওয়া যায়নি" : "No members found")
+                        : (isBn ? "এখনো কোনো সদস্য নেই" : "No members yet")}
+                    </p>
+                  </div>
+                ) : (
+                  filteredUsers.map((m) => (
+                    <MemberRow key={m._id} member={m} onClick={() => startChatWith(m)} isBn={isBn} />
+                  ))
+                )
               )}
             </div>
           </motion.div>
 
-          {/* Chat thread */}
+          {/* Chat thread — full pane on mobile, hidden until a conversation is open */}
           <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}
-            className="bg-white rounded-3xl border border-green-100 shadow-[0_6px_24px_rgba(0,60,30,0.07)] overflow-hidden flex flex-col h-[calc(100vh-240px)] min-h-[420px]">
+            className={`${active ? "flex" : "hidden md:flex"} flex-col bg-white rounded-3xl border border-green-100 shadow-[0_6px_24px_rgba(0,60,30,0.07)] overflow-hidden h-[70vh] min-h-[400px] md:h-[calc(100vh-240px)] md:min-h-[420px]`}>
             {!active ? (
               <div className="flex-1 flex items-center justify-center p-10">
                 <div className="text-center max-w-sm">

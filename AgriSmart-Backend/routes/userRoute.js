@@ -1,5 +1,5 @@
 import express from "express";
-import { loginUser,logoutUser, registerUser, updateFarmer, getMe, forgotPassword, verifyOtp, resetPassword } from "../controllers/userController.js";
+import { loginUser,logoutUser, registerUser, updateFarmer, getMe, listUsers, forgotPassword, verifyOtp, resetPassword } from "../controllers/userController.js";
 import { isAuthenticated } from "../middleware/isAuthenticated.js";
 import { userSchema, userUpdateSchema, validateUser } from "../validators/userValidate.js";
 
@@ -13,5 +13,6 @@ router.post("/reset-password", resetPassword)
 router.post("/logout",isAuthenticated,logoutUser)
 router.patch("/update", isAuthenticated, validateUser(userUpdateSchema), updateFarmer)
 router.get("/me", isAuthenticated, getMe)
+router.get("/list", isAuthenticated, listUsers)
 
 export default router

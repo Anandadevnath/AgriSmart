@@ -2,7 +2,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { Heart, Target, Users, ShieldCheck, Smartphone, Globe2, MessageCircle, Sprout } from "lucide-react";
+import { Heart, Target, Users, ShieldCheck, Globe2, MessageCircle, Sprout } from "lucide-react";
 import { useLanguage } from "../context/LanguageContext";
 import bg from "../assets/bg.png";
 
@@ -16,7 +16,6 @@ const FEATURES = [
   { icon: <ShieldCheck size={20} />, en: "Zero-intermediary direct marketplace", bn: "মধ্যস্বত্ত্বভোগী ছাড়া সরাসরি বাজার" },
   { icon: <Globe2 size={20} />, en: "Live weather & market price alerts", bn: "লাইভ আবহাওয়া ও বাজারদর সতর্কতা" },
   { icon: <MessageCircle size={20} />, en: "Direct buyer–farmer chat", bn: "ক্রেতা–কৃষক সরাসরি চ্যাট" },
-  { icon: <Smartphone size={20} />, en: "Emergency SMS notifications", bn: "জরুরি SMS সতর্কতা" },
   { icon: <Target size={20} />, en: "Simplified sales & analytics dashboard", bn: "সহজ বিক্রয় ও বিশ্লেষণ ড্যাশবোর্ড" },
 ];
 

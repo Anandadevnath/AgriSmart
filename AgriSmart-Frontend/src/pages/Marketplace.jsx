@@ -72,7 +72,7 @@ function ListingCard({ listing, onChat, onManage, isOwner }) {
         <p className="text-sm text-green-900/60 leading-relaxed mb-4 line-clamp-2 flex-1">
           {listing.description || (isBn ? 'এই ফসলটি সরাসরি কিনতে চ্যাট করুন।' : 'Chat with the farmer to buy directly.')}
         </p>
-        <div className="flex items-center justify-between gap-2 pt-3 border-t border-green-50">
+        <div className="flex flex-wrap items-center justify-between gap-2 pt-3 border-t border-green-50">
           <span className="inline-flex items-center gap-1.5 text-[13px] text-green-800 font-medium truncate">
             <span className="w-6 h-6 rounded-full bg-green-100 inline-flex items-center justify-center text-green-700 shrink-0">
               {listing.farmerId?.avatar ? (

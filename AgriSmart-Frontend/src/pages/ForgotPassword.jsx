@@ -38,9 +38,9 @@ const ForgotPassword = () => {
   };
 
   return (
-    <div className="min-h-[calc(100vh-120px)] flex items-start justify-center pt-[96px] md:pt-[120px] pb-8 px-8 bg-[radial-gradient(circle_at_60%_40%,rgba(230,255,242,0.9)_0%,#0a6b3c_100%)] bg-cover">
-      <div className="w-full max-w-[420px] bg-gradient-to-b from-white/95 to-[#fafffa] rounded-[24px] shadow-[0_8px_40px_rgba(0,0,0,0.12)] p-10 flex flex-col items-center">
-        <h1 className="text-[2.2rem] font-extrabold text-[#075c3c] m-0">Forgot Password</h1>
+    <div className="min-h-[calc(100vh-120px)] flex items-start justify-center pt-[96px] md:pt-[120px] pb-8 px-4 md:px-8 bg-[radial-gradient(circle_at_60%_40%,rgba(230,255,242,0.9)_0%,#0a6b3c_100%)] bg-cover">
+      <div className="w-full max-w-[420px] bg-gradient-to-b from-white/95 to-[#fafffa] rounded-[24px] shadow-[0_8px_40px_rgba(0,0,0,0.12)] p-6 md:p-10 flex flex-col items-center">
+        <h1 className="text-[1.8rem] md:text-[2.2rem] font-extrabold text-[#075c3c] m-0">Forgot Password</h1>
         <p className="text-[#009e5c] font-medium mb-5 text-base">Enter your account email to receive reset instructions.</p>
 
         <form onSubmit={handleSubmit} className="w-full">

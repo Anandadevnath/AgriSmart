@@ -1,7 +1,7 @@
 import React from "react";
 import { useLanguage } from '../context/LanguageContext';
 import { FeatureCard } from "./common/FeatureCard";
-import { Scan, Store, TrendingUp, MessageCircle, BellRing, LayoutGrid } from "lucide-react";
+import { Scan, Store, TrendingUp, MessageCircle, LayoutGrid } from "lucide-react";
 
 export default function FeaturesSection() {
   const { lang } = useLanguage();
@@ -27,11 +27,6 @@ export default function FeaturesSection() {
       icon: MessageCircle,
       title: isBn ? 'ক্রেতার সঙ্গে সরাসরি চ্যাট' : 'Direct Buyer Chat',
       description: isBn ? 'ক্রেতা ও কৃষকের মধ্যে সরাসরি চ্যাট — সহজ যোগাযোগ, দ্রুত দরদাম ও লেনদেন।' : 'Easy real-time chat between buyers and farmers for quick negotiation and deals.',
-    },
-    {
-      icon: BellRing,
-      title: isBn ? 'জরুরি SMS সতর্কতা' : 'Emergency SMS Notifications',
-      description: isBn ? 'জরুরি পরিস্থিতিতে তাৎক্ষণিক SMS সতর্কতা — ফসল রক্ষায় দ্রুত ব্যবস্থা নিন।' : 'Get immediate SMS alerts in emergencies so you can act before it is too late.',
     },
     {
       icon: LayoutGrid,
